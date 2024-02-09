@@ -17,10 +17,3 @@ ForceJoinKeyboard.append(
 
 ForceJoinKeyboard = InlineKeyboardMarkup(ForceJoinKeyboard)
 
-
-
-
-
-
-
-

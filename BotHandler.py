@@ -10,8 +10,7 @@ from time        import sleep
 from threading              import Thread, enumerate
 from telegram.ext           import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 
-
-
+from telegram import InputMediaVideo
 
 
 """ TODO
@@ -70,25 +69,43 @@ def thread_link_manager(update, context):
         chat_id = update.message.chat_id
         link    = update.message.text
 
-        if not link.startswith("https://x.com"):        
-            update.message.reply_text("user tweeter link bitch ")
+        if not methods.channel_checker(context, chat_id):
+            update.message.reply_text('لطفا برای استفاده از ربات در کانال ما جوین شوید. :)', reply_markup=keyboards.ForceJoinKeyboard)
+            return
+        if not (link.startswith("https://x.com") or link.startswith("https://twitter.com")):        
+            update.message.reply_text("use tweeter link bitch ")
             return
 
-        url = methods.create_url(link)
+        url, caption = methods.create_url(context, link)
+
         if not url:
             update.message.reply_text("use correct link and only tweeter link") 
             return
 
         wait = context.bot.send_message(chat_id=chat_id, text="downloading ....")
-        methods.download_video(url, chat_id)
+        nameist = [f"cache/{chat_id}_{item}.mp4" for item in range(len(url))]
+
+        i = 0
+        for item in url:
+            methods.download_video(item, nameist[i])
+            i += 1
         context.bot.edit_message_text(chat_id=chat_id, message_id=wait.message_id, text="downloaded, uploading... ")
-        context.bot.send_video(chat_id=chat_id, video=open(f"cache/{chat_id}.mp4", 'rb'))
-        remove(f"cache/{chat_id}.mp4")
+
+        media_files = [InputMediaVideo(open(file, 'rb')) for file in nameist]
+
+        medgroup = context.bot.send_media_group(chat_id=chat_id, media=media_files)
+        # context.bot.send_media_group(chat_id=chat_id, media=media_files, caption=caption, parse_mode=ParseMode.HTML)
+
+        if caption:
+            context.bot.send_message(chat_id=chat_id, text=caption, reply_to_message_id=medgroup[0].message_id)
+
+        for file in nameist:
+            remove(file)
         db.AddUsageNum(chat_id)
 
     except Exception as error:
         context.bot.send_message(chat_id=creds.Admin, text=f"error in link_manager by {chat_id}\nerror:\n{error}")
-        context.bot.send_message(chat_id=chat_id, message_id=wait.message_id, text="error happend")
+        context.bot.send_message(chat_id=chat_id, text="error happend")
 
 
 
@@ -103,7 +120,7 @@ def thread_callback(update, context):
 
         if query.data == 'joined':
             if methods.channel_checker(context, query.message.chat_id):
-                query.edit_message_text(" go onnnnnn use this bitch")
+                query.edit_message_text("go onnnnnn use the bot bitch")
             else:
                 query.answer("جوین نشدی که :(")        
 
@@ -113,21 +130,19 @@ def thread_callback(update, context):
 #########################################################################################
 #########################################################################################
 
+
 def start(update, context):
     Thread(target=thread_start, args=(update, context, )).start()
 
 def link_manager(update, context):
-    Thread(target=thread_link_manager, args=(update, context, ), name=update.message.chat_id).start()
+    if not active_thread(update.message.chat_id):
+        Thread(target=thread_link_manager, args=(update, context, ), name=update.message.chat_id).start()
 
 def help(update, context):
     Thread(target=thread_help, args=(update, context, )).start()
 
 def callback(update, context):
     Thread(target=thread_callback, args=(update, context, )).start()
-
-
-
-
 
 def go_live():
     print("going live...")
@@ -137,7 +152,6 @@ def go_live():
             updater.dispatcher.add_handler(CommandHandler('start', start))
             updater.dispatcher.add_handler(CommandHandler('restart', start))
             updater.dispatcher.add_handler(CommandHandler('help', help))
-            # updater.dispatcher.add_handler(CommandHandler('admin', admin))
             updater.dispatcher.add_handler(CallbackQueryHandler(callback))
             updater.dispatcher.add_handler(MessageHandler(Filters.text, link_manager))
             updater.start_polling()     

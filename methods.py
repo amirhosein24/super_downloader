@@ -1,19 +1,14 @@
 from creds import ForceJoinId, Admin
 
-
-from re import sub
 from os import mkdir
 from requests import get 
 from bs4 import BeautifulSoup
-from uuid import uuid4
+
 
 try:
     mkdir("cache")
 except:
     pass
-
-
-
 
 
 def channel_checker(context, user_id):
@@ -29,35 +24,33 @@ def channel_checker(context, user_id):
         return True
 
 
-
-
 def download_video(url, name) -> None:
-
     response = get(url)
-    with open(f"cache/{name}.mp4", "wb") as file:
+    with open(name, "wb") as file:
         file.write(response.content)
 
 
-def create_url(url):
+def create_url(context, url):
 
     api_url = f"https://twitsave.com/info?url={url}"
 
     try:
         response = get(api_url)
         data = BeautifulSoup(response.text, "html.parser")
-        download_button = data.find_all("div", class_="origin-top-right")[0]
-        quality_buttons = download_button.find_all("a")
-        highest_quality_url = quality_buttons[0].get("href") # Highest quality video url
-        
-        # file_name = data.find_all("div", class_="leading-tight")[0].find_all("p", class_="m-2")[0].text # Video file name
-        # file_name = sub(r"[^a-zA-Z0-9]+", ' ', file_name).strip() # Remove special characters from file name
+        download_button = data.find_all("div", class_="origin-top-right")
 
-        # if not file_name:
-        #     file_name = str(uuid4()) + ".mp4"
+        highest_quality_url = []
+        for item in download_button:
+            quality_buttons = item.find_all("a")
+            highest_quality_url.append(quality_buttons[0].get("href")) # Highest quality video url
 
-        return highest_quality_url
-    except:
-        return False
+        try:
+            caption = data.find_all("div", class_="leading-tight")[0].find_all("p", class_="m-2")[0].text # Video caption
+        except:
+            caption = None
 
-def get_caption():
-    pass
+        return highest_quality_url, caption
+
+    except Exception as error:
+        context.bot.send_message(chat_id=Admin, text=f"Error in create url : {url}\n\nerror : \n{error}")
+        return False, False
