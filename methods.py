@@ -33,7 +33,6 @@ def download_video(url, name) -> None:
 def create_url(context, url):
 
     api_url = f"https://twitsave.com/info?url={url}"
-
     try:
         response = get(api_url)
         data = BeautifulSoup(response.text, "html.parser")
@@ -53,4 +52,4 @@ def create_url(context, url):
 
     except Exception as error:
         context.bot.send_message(chat_id=Admin, text=f"Error in create url : {url}\n\nerror : \n{error}")
-        return False, False
+        return False, False 
