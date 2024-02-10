@@ -8,7 +8,8 @@ def load_json():
     BotToken = config["BotToken"]
     ForceJoin = config["ForceJoin"]
     ForceJoinId = config["ForceJoinId"]
+    Sponsor = config["Sponsor"]
 
-    return Admin, BotToken, ForceJoin, ForceJoinId
+    return Admin, BotToken, ForceJoin, ForceJoinId, Sponsor
 
-Admin, BotToken, ForceJoin, ForceJoinId = load_json()
+Admin, BotToken, ForceJoin, ForceJoinId, Sponsor = load_json()

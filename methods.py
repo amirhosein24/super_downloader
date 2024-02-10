@@ -10,6 +10,7 @@ try:
 except:
     pass
 
+proxies = {'http': 'socks5://localhost:2080', 'https': 'socks5://localhost:2080'}
 
 def channel_checker(context, user_id):
     try:
@@ -25,7 +26,7 @@ def channel_checker(context, user_id):
 
 
 def download_video(url, name) -> None:
-    response = get(url)
+    response = get(url, proxies=proxies)
     with open(name, "wb") as file:
         file.write(response.content)
 
@@ -34,7 +35,7 @@ def create_url(context, url):
 
     api_url = f"https://twitsave.com/info?url={url}"
     try:
-        response = get(api_url)
+        response = get(api_url, proxies=proxies)
         data = BeautifulSoup(response.text, "html.parser")
         download_button = data.find_all("div", class_="origin-top-right")
 
