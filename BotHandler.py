@@ -140,7 +140,7 @@ def go_live():
     print("going live...")
     while True:
         try:
-            updater = Updater(token=creds.BotToken, use_context=True, request_kwargs={'proxy_url': 'socks5://localhost:2080'})
+            updater = Updater(token=creds.BotToken, use_context=True)
             updater.dispatcher.add_handler(CommandHandler('start', start))
             updater.dispatcher.add_handler(CommandHandler('restart', start))
             updater.dispatcher.add_handler(CommandHandler('help', help))
