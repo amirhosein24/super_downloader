@@ -5,8 +5,10 @@ from requests import get
 from bs4 import BeautifulSoup
 
 
+
+
 try:
-    mkdir("cache")
+    mkdir(__file__[:-10] + "cache")
 except:
     pass
 

@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine, Column, Integer, String, DateTime
 
 
-engine = create_engine(f"sqlite:///{getcwd()}/db.sqlite", poolclass=QueuePool, pool_recycle=1800,
+engine = create_engine(f"sqlite:///{__file__[:-11]}db.sqlite", poolclass=QueuePool, pool_recycle=1800,
                        connect_args={'check_same_thread': False})
 
 Base = declarative_base()

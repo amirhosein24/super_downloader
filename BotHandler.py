@@ -70,7 +70,7 @@ def thread_link_manager(update, context):
             return
 
         wait_message = context.bot.send_message(chat_id=chat_id, text="داره دانلود میشه صبر کن یکم ...")
-        file_names = [f"cache/{chat_id}_{item}.mp4" for item in range(len(url))]
+        file_names = [f"{__file__[:-13]}/cache/{chat_id}_{item}.mp4" for item in range(len(url))]
 
         i = 0
         for item in url:
@@ -101,9 +101,9 @@ def thread_link_manager(update, context):
         context.bot.send_message(chat_id=chat_id, text="ی مشکلی پیش اومد ببشید, دوباره بفرست برام شاید تونستم")
 
     finally:
-        for file in listdir(getcwd()+"/cache/"):
+        for file in listdir(__file__[:-13]+"/cache/"):
             if str(file).startswith(str(chat_id)):
-                remove("cache/"+file)
+                remove(__file__[:-13]+"/cache/"+file)
 
 
 def thread_callback(update, context):
