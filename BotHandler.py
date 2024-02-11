@@ -4,17 +4,16 @@ import methods
 import keyboards
 import DataBase as db
 
+from time import sleep
 from os import remove, getcwd, listdir
-from time        import sleep
 from telegram import InputMediaVideo
-from threading              import Thread, enumerate
-from telegram.ext           import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
+from threading import Thread, enumerate
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 
 
 """ TODO
-complete threading , one at time to upload for a preson
+rewrite thread link
 better detail
-ad
 after query cheking automatically does the job that was asked
 """
 
@@ -30,7 +29,6 @@ def thread_start(update, context):
             username  = update.message.chat.username
             firstname = update.message.chat.first_name
             lastname  = update.message.chat.last_name
-
 
             if db.add_user(int(chat_id), username, firstname, lastname):
                 context.bot.send_message(chat_id=creds.Admin, text=f"bot started by:\nchat_id: {chat_id}\nname: {firstname}-{lastname}\nusername: @{username}")               
@@ -71,28 +69,31 @@ def thread_link_manager(update, context):
             update.message.reply_text("مطمنی لینکی که فرستادی درسته ؟ ") 
             return
 
-        wait = context.bot.send_message(chat_id=chat_id, text="داره دانلود میشه صبر کن یکم ...")
-        nameist = [f"cache/{chat_id}_{item}.mp4" for item in range(len(url))]
+        wait_message = context.bot.send_message(chat_id=chat_id, text="داره دانلود میشه صبر کن یکم ...")
+        file_names = [f"cache/{chat_id}_{item}.mp4" for item in range(len(url))]
 
         i = 0
         for item in url:
-            methods.download_video(item, nameist[i])
+            methods.download_video(item, file_names[i])
             i += 1
 
-        context.bot.edit_message_text(chat_id=chat_id, message_id=wait.message_id, text="دانلود شد, الان میفرستمش برات")
+        context.bot.edit_message_text(chat_id=chat_id, message_id=wait_message.message_id, text="دانلود شد, الان میفرستمش برات")
         
-        if len(nameist) == 1:
-            context.bot.send_video(chat_id=chat_id, video=open(nameist[0], 'rb'), caption=caption, reply_markup=keyboards.SponsorKeyboard)
-        else:
+        if len(file_names) == 1: # if its one video in the tweet
+            context.bot.send_video(chat_id=chat_id, video=open(file_names[0], 'rb'), caption=caption, reply_markup=keyboards.SponsorKeyboard)
+        else: # if its a group video
             media_files = []
-            lastitem = nameist.pop()
+            lastitem = file_names.pop()
             media_files.append(InputMediaVideo(open(lastitem, "rb"), caption=caption))            
 
-            for item in nameist:
+            for item in file_names:
                 media_files.append(InputMediaVideo(open(item, 'rb')))
             context.bot.send_media_group(chat_id=chat_id, media=media_files)
+            
+            context.bot.send_message(chat_id=chat_id, text="( *︾▽︾)", reply_markup=keyboards.SponsorKeyboard)
 
-        context.bot.deleteMessage(chat_id=chat_id, message_id=wait.message_id)
+
+        context.bot.deleteMessage(chat_id=chat_id, message_id=wait_message.message_id)
         db.AddUsageNum(chat_id)
 
     except Exception as error:
@@ -126,8 +127,8 @@ def start(update, context):
     Thread(target=thread_start, args=(update, context, )).start()
 
 def link_manager(update, context):
-    if not active_thread(update.message.chat_id):
-        Thread(target=thread_link_manager, args=(update, context, ), name=update.message.chat_id).start()
+    if not active_thread(str(update.message.chat_id)): # makes user use one download at a time
+        Thread(target=thread_link_manager, args=(update, context, ), name=str(update.message.chat_id)).start()
 
 def help(update, context):
     Thread(target=thread_help, args=(update, context, )).start()
@@ -139,7 +140,7 @@ def go_live():
     print("going live...")
     while True:
         try:
-            updater = Updater(token=creds.BotToken, use_context=True)#, request_kwargs={'proxy_url': 'socks5://localhost:2080'}
+            updater = Updater(token=creds.BotToken, use_context=True, request_kwargs={'proxy_url': 'socks5://localhost:2080'})
             updater.dispatcher.add_handler(CommandHandler('start', start))
             updater.dispatcher.add_handler(CommandHandler('restart', start))
             updater.dispatcher.add_handler(CommandHandler('help', help))
@@ -149,5 +150,5 @@ def go_live():
             print("bot is live.")
             break
         except Exception as e:
-            print(f"Error. Retrying in 10 sec ... : {e}")
+            print(f"Retrying in 10 sec... Error: {e}")
             sleep(10)
