@@ -35,7 +35,7 @@ def thread_start(update, context):
             if not methods.channel_checker(context, chat_id):
                 update.message.reply_text('لطفا برای استفاده از ربات در کانال ما جوین شوید. :)', reply_markup=keyboards.ForceJoinKeyboard, reply_to_message_id=update.message.message_id)
                 return
-            update.message.reply_text(f"سلام {firstname}, به ربات دانلودر توییتر خوش آومدی \nلینک توییتت رو بفرست اینجا تا برات فیلمشو بفرستم")
+            update.message.reply_text(f"سلام {firstname}, به ربات دانلودر توییتر خوش آومدی \nلینک توییتت رو بفرست اینجا تا برات فیلم هاشو بفرستم")
         except Exception as error:
             context.bot.send_message(chat_id=creds.Admin, text=f"Error in thread_start by {chat_id}\nerror : \n{error}")
 
@@ -60,13 +60,13 @@ def thread_link_manager(update, context):
             return
         
         if not (link.startswith("https://x.com") or link.startswith("https://twitter.com")):        
-            update.message.reply_text("لینک توییتر رو برام بفرست :(")
+            update.message.reply_text("فعلا فقط میتونم فیلم های توییتر (ایکس) رو دانلود کنم, لینک توییتر رو بفرست برام")
             return
 
         url, caption = methods.create_url(context, link)
 
         if not url:
-            update.message.reply_text("مطمنی لینکی که فرستادی درسته ؟ ") 
+            update.message.reply_text("داخل این لینک هیچ فیلمی پیدا نکردم") 
             return
 
         wait_message = context.bot.send_message(chat_id=chat_id, text="داره دانلود میشه صبر کن یکم ...")
@@ -90,7 +90,11 @@ def thread_link_manager(update, context):
                 media_files.append(InputMediaVideo(open(item, 'rb')))
             context.bot.send_media_group(chat_id=chat_id, media=media_files)
             
-            context.bot.send_message(chat_id=chat_id, text="( *︾▽︾)", reply_markup=keyboards.SponsorKeyboard)
+            context.bot.send_message(chat_id=chat_id, text="""
+                                                            ( •_•)                       (•_• )
+                                                            ( ง )ง                       ୧( ୧ )
+                                                            /︶\                          /︶\\
+                                                            """, reply_markup=keyboards.SponsorKeyboard)
 
 
         context.bot.deleteMessage(chat_id=chat_id, message_id=wait_message.message_id)
