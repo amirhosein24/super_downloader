@@ -9,3 +9,14 @@ ForceJoinKeyboard = InlineKeyboardMarkup(ForceJoinKeyboard)
 
 SponsorKeyboard = [[InlineKeyboardButton(item, url=Sponsor[item]) for item in Sponsor.keys()]]
 SponsorKeyboard = InlineKeyboardMarkup(SponsorKeyboard)
+
+
+
+
+def CreateKey(data):
+    pass
+
+
+
+
+
