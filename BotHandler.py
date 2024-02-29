@@ -12,7 +12,9 @@ from telegram import InputMediaVideo
 from threading import Thread, enumerate
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 
-import asyncio
+# import asyncio
+
+from asyncio import new_event_loop, set_event_loop
 
 """ TODO
 rewrite thread link
@@ -27,8 +29,6 @@ home = path.dirname(path.realpath(__file__))
 # bot = TelegramClient(home + 'telethon', creds.ApiId, creds.ApiHash).start(bot_token=creds.BotToken)
 
 
-import asyncio
-import threading
 
 
 
@@ -97,7 +97,7 @@ def thread_link_manager(update, context):
                 update.message.reply_text("داخل این لینک هیچ فیلمی پیدا نکردم") 
                 return
 
-            wait_message = context.bot.send_message(chat_id=chat_id, text="داره دانلود میشه صبر کن یکم ...")
+            wait_message = context.bot.send_message(chat_id=chat_id, text="داره دانلود میشه صبر کن یکم ...", reply_to_message_id=update.message.message_id)
             file_names = [f"{__file__[:-13]}/cache/{chat_id}_{item}.mp4" for item in range(len(url))]
 
             i = 0
@@ -132,33 +132,27 @@ def thread_link_manager(update, context):
 
 
 
-        if (link.startswith("https://www.youtube.com") or link.startswith("https://youtu.be")):      # youtube section
+        elif link.startswith("https://www.youtube.com") or link.startswith("https://youtu.be") or link.startswith("https://youtube.com"):      # youtube section
+            wait_message = context.bot.send_message(chat_id=chat_id, text="در حال پردازش ...", reply_to_message_id=update.message.message_id)
+
+
+
+            data = methods.youtube_getinfo(link)
 
 
 
 
-            # Create a thread to run the coroutine
-            thread = threading.Thread(target=run_in_thread, args=(file_sender(chat_id, "THE GARFIELD MOVIE Official Trailer (2024).mp4"),))
-            thread.start()
-
-
-            print("gogogogogo")
+            context.bot.edit_message_text(chat_id=chat_id, message_id=wait_message.message_id, text=data["title"] + "\nlength : " + data["length"], reply_markup=keyboards.CreateKey(data))
 
 
 
-            wait_message = context.bot.send_message(chat_id=chat_id, text="در حال پردازش ...")
-            # data = methods.youtube_getinfo(link)
-            # print(data)
-            # context.bot.edit_message_text(chat_id=chat_id, message_id=wait_message.message_id, text=data["title"] + "\nlength : " + data["length"])
-            # context.bot.send_video(chat_id=chat_id, video=open(file_names[0], 'rb'), caption=caption, reply_markup=keyboards.SponsorKeyboard)
-            # update.message.reply_text(data) 
 
 
     except Exception as error:
         print(error)
+        context.bot.send_message(chat_id=chat_id, text="ی مشکلی پیش اومد ببشید, دوباره بفرست برام شاید تونستم")
 
         # context.bot.send_message(chat_id=creds.Admin, text=f"error in link_manager by {chat_id}\nerror:\n{error}")
-        # context.bot.send_message(chat_id=chat_id, text="ی مشکلی پیش اومد ببشید, دوباره بفرست برام شاید تونستم")
     finally:
         pass 
         # try: TODO
@@ -169,26 +163,25 @@ def thread_link_manager(update, context):
         #     pass
 
 
+from telethon.tl.types import DocumentAttributeVideo
 
-async def file_sender(chat_id, file_path):
-    print("--------------------------------------------------------------------- ")
-    async with TelegramClient("telethon", creds.ApiId, creds.ApiHash) as client:
-        print("hhhhhhhhhhhhhhhhhhhhh")
-        # client.start(bot_token=creds.BotToken)
-        if str(file_path).endswith("mp4"):
-            await client.send_video(chat_id, file_path) #TODO all formats files video audio ...
-        else:
-            await client.send_file(chat_id, file_path) #TODO all formats files video audio ...
+async def file_sender(chat_id, file_path, caption, duration):
+    try : 
+        async with TelegramClient("telethon", creds.ApiId, creds.ApiHash) as client:
+            attributes = [DocumentAttributeVideo(duration=duration, w=1280, h=720)]
+            await client.send_file(chat_id, file_path, attributes=attributes, caption=caption)    #TODO all formats files video audio ...
+
+
+    except Exception as error:
+        print("error in file sender", str(error))
+    finally:
+        remove(file_path)
 
 
 def run_in_thread(coro):
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
+    loop = new_event_loop()
+    set_event_loop(loop)
     loop.run_until_complete(coro)
-
-
-
-
 
 
 
@@ -201,6 +194,8 @@ def run_in_thread(coro):
 def thread_callback(update, context):
 
         query = update.callback_query
+    
+
 
         if query.data == 'joined':
             if methods.channel_checker(context, query.message.chat_id):
@@ -209,6 +204,23 @@ def thread_callback(update, context):
                 # print(query.message.reply_to_message.text)
             else:
                 query.answer("جوین نشدی که :(")        
+
+
+        else:
+
+            query.edit_message_text("دانلود شروع شد ...")
+            file_path, title, duration = methods.youtube_getvideo(query.message.reply_to_message.text, query.data)
+            print(file_path, title, duration)
+            query.edit_message_text("دانلود تمام شد , در حال آپلود...")
+            Thread(target=run_in_thread, args=(file_sender(query.message.chat_id, file_path, title, duration),)).start()
+
+
+        
+
+
+
+
+
 
 
 #########################################################################################

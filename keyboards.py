@@ -12,11 +12,19 @@ SponsorKeyboard = InlineKeyboardMarkup(SponsorKeyboard)
 
 
 
-
 def CreateKey(data):
-    pass
+
+    keyboard = []
+
+    for res in data.keys():
+        if not res in ["title", "length", "None"]:
+            keyboard.append([InlineKeyboardButton(f"{res} -- {data[res]}MB", callback_data=res)])
+            
 
 
+    keyboard = InlineKeyboardMarkup(keyboard)
+
+    return keyboard
 
 
 

@@ -5,6 +5,9 @@ from requests import get
 from bs4 import BeautifulSoup
 
 
+from pytube import YouTube
+from datetime import timedelta
+
 
 try:
     mkdir(path.dirname(path.realpath(__file__)) + "/cache")
@@ -25,17 +28,6 @@ def channel_checker(context, user_id):
     except Exception as e:
         context.bot.send_message(chat_id=Admin, text=f"Error in channel checker by {user_id}:\nError : \n{e}")
         return True
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -69,20 +61,6 @@ def create_url(context, url):
     except Exception as error:
         context.bot.send_message(chat_id=Admin, text=f"Error in create url : {url}\n\nerror : \n{error}")
         return False, False 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # import re
@@ -128,20 +106,7 @@ def create_url(context, url):
 
 # with sync_playwright() as playwright:
 #     run(playwright)
-
-
-
-
-
-
-
-
-
 ########################################################################################################################################## youtube
-
-from pytube import YouTube
-from datetime import timedelta
-
 
 def youtube_getinfo(url):
     try:
@@ -149,44 +114,53 @@ def youtube_getinfo(url):
 
         data = {}
         data["title"], data["length"] = yt.title, str(timedelta(seconds=yt.length)) #in seconds
-
-        video = yt.streams.filter(progressive=False, file_extension='mp4')
+        video = yt.streams.filter(progressive=True)
 
         for stream in video:
             resolution = str(stream.resolution)
             file_size = str(round(stream.filesize / (1024 * 1024), 2))
-            data[resolution] = [file_size, stream.itag] 
+            if resolution not in data or file_size < data[resolution]:
+                data[resolution] = file_size 
         return data
 
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error: {e}") #TODO
         return None
 
 
 
-def youtube_getvideo(url, itag=None):
+def youtube_getvideo(url, res):
     try:
         yt = YouTube(url)
 
-        video = yt.streams.get_by_itag(itag)
-        video.download()
+        stream = yt.streams.filter(res=res, progressive=True).first()
 
-        print("Video downloaded successfully")
+        file = stream.download()
+
+        return file, yt.title, yt.length
+
 
     except Exception as e:
         print(f"Error downloading video: {e}")
+        return False, False, False
+
+# file = video.download(output_path=output_path) TODO
+# print(youtube_getvideo("https://youtu.be/jvODRkyz_8A?si=5GmUK3DU4oetd9d5", "360p"))
+
+
+
+
+
+
+
+
+
+
+
 
 
 ########################################################################################################################################## insta
 
-
-
-
-
-
 ########################################################################################################################################## tiktok
-
-
-
 
 ########################################################################################################################################## link 2 file
