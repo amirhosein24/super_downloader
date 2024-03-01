@@ -69,49 +69,7 @@ def create_url(context, url):
         return False, False 
 
 
-# import re
-# from playwright.sync_api import Playwright, sync_playwright, expect
 
-
-# def run(playwright: Playwright) -> None:
-#     browser = playwright.chromium.launch(headless=False)
-#     context = browser.new_context()
-#     page = context.new_page()
-#     page.goto("https://ssstwitter.com/")
-#     page.get_by_role("button", name="Close").click()
-#     page.get_by_placeholder("Insert link").fill("https://x.com/1youngfairo/status/1760390577684648266?s=20")
-#     page.get_by_role("button", name="Download").click()
-
-#     print("loading it")
-
-#     page.wait_for_load_state("networkidle")
-
-#     print("gogo")
-#     selector = 'button[id^="download"]'
-#     button = page.query_selector(selector)
-#     print(button)
-
-
-#     # Using regex to extract the download URL
-#     # download_url_match = re.search(r"url='(.*?)'", str(download))
-
-#     # if download_url_match:
-#     #     download_url = download_url_match.group(1)
-#     #     print(download_url)
-#     # else:
-#     #     print("Download URL not found.")
-
-#     # input("------------------")
-
-
-#     # print(download.url)
-#     # ---------------------
-#     context.close()
-#     browser.close()
-
-
-# with sync_playwright() as playwright:
-#     run(playwright)
 ########################################################################################################################################## youtube
 
 def youtube_getinfo(url):
@@ -127,11 +85,13 @@ def youtube_getinfo(url):
             file_size = str(round(stream.filesize / (1024 * 1024), 2))
             if resolution not in data or file_size < data[resolution]:
                 data[resolution] = file_size 
-        return data
+        return data, True
 
-    except Exception as e:
-        print(f"Error: {e}") #TODO
-        return None
+    except Exception as error:
+
+        return str(error), False
+
+
 
 
 

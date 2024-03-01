@@ -6,35 +6,20 @@ import DataBase as db
 
 
 from time import sleep
-from os import remove, listdir, path
+from os import remove, path
+
+
+
+from telethon.tl.types import DocumentAttributeVideo
 from telethon import TelegramClient
 from telegram import InputMediaVideo
 from threading import Thread, enumerate
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
-
-# import asyncio
-
 from asyncio import new_event_loop, set_event_loop
 
-""" TODO
-rewrite thread link
-better detail
-after query cheking automatically does the job that was asked
-"""
+
 
 home = path.dirname(path.realpath(__file__))
-
-
-
-# bot = TelegramClient(home + 'telethon', creds.ApiId, creds.ApiHash).start(bot_token=creds.BotToken)
-
-
-
-
-
-
-
-
 
 
 
@@ -134,28 +119,27 @@ def thread_link_manager(update, context):
 
 
 
-
         elif link.startswith("https://www.youtube.com") or link.startswith("https://youtu.be") or link.startswith("https://youtube.com"):      # youtube section
+
             wait_message = context.bot.send_message(chat_id=chat_id, text="در حال پردازش ...", reply_to_message_id=update.message.message_id)
 
+            data, working = methods.youtube_getinfo(link)
 
+            if data and working:
+                context.bot.edit_message_text(chat_id=chat_id, message_id=wait_message.message_id, text=data["title"] + "\nlength : " + data["length"], reply_markup=keyboards.CreateKey(data))
+            elif not working:
 
-            data = methods.youtube_getinfo(link)
-
-
-
-
-            context.bot.edit_message_text(chat_id=chat_id, message_id=wait_message.message_id, text=data["title"] + "\nlength : " + data["length"], reply_markup=keyboards.CreateKey(data))
-
-
+                context.bot.edit_message_text(chat_id=chat_id, message_id=wait_message.message_id, text="this video cant be downloaded")
+                context.bot.send_message(chat_id=creds.Admin, text=data)
 
 
 
     except Exception as error:
-        print(error)
+        
         context.bot.send_message(chat_id=chat_id, text="ی مشکلی پیش اومد ببشید, دوباره بفرست برام شاید تونستم")
+        context.bot.send_message(chat_id=creds.Admin, text=f"error in link_manager by {chat_id}\nerror:\n{error}")
 
-        # context.bot.send_message(chat_id=creds.Admin, text=f"error in link_manager by {chat_id}\nerror:\n{error}")
+
     finally:
         pass 
         # try: TODO
@@ -166,8 +150,7 @@ def thread_link_manager(update, context):
         #     pass
 
 
-from telethon.tl.types import DocumentAttributeVideo
-import os
+
 
 async def file_sender(chat_id, file_path, caption, duration):
     try : 
@@ -180,8 +163,8 @@ async def file_sender(chat_id, file_path, caption, duration):
         print("error in file sender", str(error))
     finally:
 
-        if os.path.isfile(file_path):
-            os.remove(file_path)
+        if path.isfile(file_path):
+            remove(file_path)
 
 
 def run_in_thread(coro):
@@ -200,53 +183,54 @@ def run_in_thread(coro):
 def thread_callback(update, context):
 
         query = update.callback_query
-    
+        chat_id = query.message.chat_id
+        command = query.data
 
 
-        if query.data == 'joined':
-            if methods.channel_checker(context, query.message.chat_id):
-                query.edit_message_text("ربات فعال شد الان میتونی استفاده کنی ")
-                # thread_link_manager(query, context)
-                # print(query.message.reply_to_message.text)
-            else:
-                if query.message.chat_id == creds.Admin :
-                    query.answer("اوففف ادمینن")        
-                    query.message.reply_text('choose command :', reply_markup=keyboards.AdminKeyboard)
+        try:
+
+            if command == 'joined':
+                if methods.channel_checker(context, chat_id):
+                    query.edit_message_text("ربات فعال شد الان میتونی استفاده کنی ")
+                    # thread_link_manager(query, context)
+                    # print(query.message.reply_to_message.text)
                 else:
-                    query.answer("جوین نشدی که :(")        
+                    if chat_id == creds.Admin :
+                        query.answer("اوففف ادمینن")        
+                        query.message.reply_text('choose command :', reply_markup=keyboards.AdminKeyboard)
+                    else:
+                        query.answer("جوین نشدی که :(")        
+
+            elif command.split("-")[0] == "youtube" :   # youtube manager
+
+                query.edit_message_text("دانلود شروع شد ...")
+                file_path, title, duration = methods.youtube_getvideo(query.message.reply_to_message.text, command.split("-")[1])
+    
+                query.edit_message_text("دانلود تمام شد , در حال آپلود...")
+
+                run_in_thread(file_sender(chat_id, file_path, title, duration))
+                
+                context.bot.delete_message(chat_id=chat_id, message_id=query.message.message_id)
 
 
 
+            # if admin  #TODO bring admin down
+            elif chat_id == creds.Admin :
+    
+                if command == 'sendall': #TODO complete this section
+                    admin_command = "sendall"
+                    query.message.reply_text('sent your text to sent to all users ')
 
+                elif command == "db":
+                    context.bot.send_document(chat_id=chat_id, document=open(home+'db.sqlite', "rb"))
 
-        else:   # youtube manager
+                return
 
-            query.edit_message_text("دانلود شروع شد ...")
-            file_path, title, duration = methods.youtube_getvideo(query.message.reply_to_message.text, query.data)
- 
-            query.edit_message_text("دانلود تمام شد , در حال آپلود...")
-
-            run_in_thread(file_sender(query.message.chat_id, file_path, title, duration))
-            
-            context.bot.delete_message(chat_id=query.message.chat_id, message_id=query.message.message_id)
-
-
-
-
-        # if admin 
-        if query.message.chat_id == creds.Admin :
- 
-
-            if query.data == 'sendall': #TODO complete this section
-                admin_command = "sendall"
-                query.message.reply_text('sent your text to sent to all users ')
-
-            elif query.data == "db":
-                context.bot.send_document(chat_id=query.message.chat_id, document=open(home+'database.db', "rb"))
-
-
-
-
+        except Exception as error:     
+            context.bot.send_message(chat_id=chat_id, text="ی مشکلی پیش اومد ببشید, دوباره بفرست برام شاید تونستم")
+            context.bot.send_message(chat_id=creds.Admin, text=f"error in link_manager by {chat_id}\nerror:\n{error}")
+           
+           
 #########################################################################################
 #########################################################################################
 
