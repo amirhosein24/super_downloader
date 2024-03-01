@@ -1,19 +1,16 @@
 from creds import ForceJoinId, Admin
 
 from os import mkdir, path
-from requests import get
-from bs4 import BeautifulSoup
-
-
-from pytube import YouTube
-from datetime import timedelta
+from requests import get, head
 
 
 
-home = path.dirname(path.realpath(__file__))
 
 
-for addres in [home + "/cache", home + "/cache/twitter", home + "/cache/youtube"]:
+home = path.dirname(path.realpath(__file__)) + "/"
+
+
+for addres in [home + "cache", home + "cache/twitter", home + "cache/youtube", home + "cache/other"]:
     try:
         mkdir(addres)
     except:
@@ -36,13 +33,12 @@ def channel_checker(context, user_id):
 
 
 ########################################################################################################################################## twiiter
+from bs4 import BeautifulSoup
+    
 def download_video(url, name) -> None:
     response = get(url)
-
     with open(name, "wb") as file:
-
         file.write(response.content)
-
 
 def create_url(context, url):
 
@@ -71,6 +67,10 @@ def create_url(context, url):
 
 
 ########################################################################################################################################## youtube
+from pytube import YouTube
+from datetime import timedelta
+
+
 
 def youtube_getinfo(url):
     try:
@@ -101,18 +101,64 @@ def youtube_getvideo(url, res):
 
         stream = yt.streams.filter(res=res, progressive=True).first()
 
-        file = stream.download(output_path=home + "/cache/youtube/")
+        yield int(stream.filesize / (1024 * 1024))
 
-        return file, yt.title, yt.length
+
+        file = stream.download(output_path=home + "cache/youtube/")
+
+        yield file, yt.title
 
 
     except Exception as e:
         print(f"Error downloading video: {e}")
-        return False, False, False
+        yield False, False
 
 
 ########################################################################################################################################## insta
 
 ########################################################################################################################################## tiktok
 
-########################################################################################################################################## link 2 file
+########################################################################################################################################## link 2 file4
+
+from urllib.parse import urlparse
+
+
+
+
+def downloader(url):
+
+  response = get(url, allow_redirects=True)
+
+  if response.status_code == 200:
+    content_disposition = response.headers.get("content-disposition")
+    if content_disposition:
+      filename = content_disposition.split("filename=")[1].strip('"')
+    else:
+      parsed_url = urlparse(url)
+      filename = parsed_url.path.split("/")[-1]
+
+    with open(f"{home}cache/other/{filename}", "wb") as file:
+      file.write(response.content)
+
+    return filename
+  else:
+    print(f"Failed to download file: {response.status_code}")
+    return None
+
+
+
+
+def get_file_size(url):
+
+
+  response = head(url, allow_redirects=True)
+
+  if response.status_code == 200:
+
+    content_length = response.headers.get("content-length")
+    if content_length:
+      return int(content_length) / (1024 * 1024)
+    else:
+      return None
+  else:
+    return None
