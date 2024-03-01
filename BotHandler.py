@@ -90,7 +90,6 @@ def thread_link_manager(update, context):
 
         if (link.startswith("https://x.com") or link.startswith("https://twitter.com")):      # twitter section
 
-
             url, caption = methods.create_url(context, link)
 
             if not url:
@@ -98,8 +97,11 @@ def thread_link_manager(update, context):
                 return
 
             wait_message = context.bot.send_message(chat_id=chat_id, text="داره دانلود میشه صبر کن یکم ...", reply_to_message_id=update.message.message_id)
-            file_names = [f"{__file__[:-13]}/cache/{chat_id}_{item}.mp4" for item in range(len(url))]
 
+
+
+            file_names = [f"{home}/cache/twitter/{chat_id}_{item}.mp4" for item in range(len(url))]
+  
             i = 0
             for item in url:
                 methods.download_video(item, file_names[i])
@@ -109,6 +111,7 @@ def thread_link_manager(update, context):
             
             if len(file_names) == 1: # if its one video in the tweet
                 context.bot.send_video(chat_id=chat_id, video=open(file_names[0], 'rb'), caption=caption, reply_markup=keyboards.SponsorKeyboard)
+
             else: # if its a group video
                 media_files = []
                 lastitem = file_names.pop()
@@ -164,6 +167,7 @@ def thread_link_manager(update, context):
 
 
 from telethon.tl.types import DocumentAttributeVideo
+import os
 
 async def file_sender(chat_id, file_path, caption, duration):
     try : 
@@ -175,7 +179,9 @@ async def file_sender(chat_id, file_path, caption, duration):
     except Exception as error:
         print("error in file sender", str(error))
     finally:
-        remove(file_path)
+
+        if os.path.isfile(file_path):
+            os.remove(file_path)
 
 
 def run_in_thread(coro):
@@ -203,22 +209,40 @@ def thread_callback(update, context):
                 # thread_link_manager(query, context)
                 # print(query.message.reply_to_message.text)
             else:
-                query.answer("جوین نشدی که :(")        
+                if query.message.chat_id == creds.Admin :
+                    query.answer("اوففف ادمینن")        
+                    query.message.reply_text('choose command :', reply_markup=keyboards.AdminKeyboard)
+                else:
+                    query.answer("جوین نشدی که :(")        
 
 
-        else:
+
+
+
+        else:   # youtube manager
 
             query.edit_message_text("دانلود شروع شد ...")
             file_path, title, duration = methods.youtube_getvideo(query.message.reply_to_message.text, query.data)
-            print(file_path, title, duration)
+ 
             query.edit_message_text("دانلود تمام شد , در حال آپلود...")
-            Thread(target=run_in_thread, args=(file_sender(query.message.chat_id, file_path, title, duration),)).start()
+
+            run_in_thread(file_sender(query.message.chat_id, file_path, title, duration))
+            
+            context.bot.delete_message(chat_id=query.message.chat_id, message_id=query.message.message_id)
 
 
-        
 
 
+        # if admin 
+        if query.message.chat_id == creds.Admin :
+ 
 
+            if query.data == 'sendall': #TODO complete this section
+                admin_command = "sendall"
+                query.message.reply_text('sent your text to sent to all users ')
+
+            elif query.data == "db":
+                context.bot.send_document(chat_id=query.message.chat_id, document=open(home+'database.db', "rb"))
 
 
 

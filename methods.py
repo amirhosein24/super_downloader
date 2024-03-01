@@ -9,11 +9,15 @@ from pytube import YouTube
 from datetime import timedelta
 
 
-try:
-    mkdir(path.dirname(path.realpath(__file__)) + "/cache")
-except:
-    pass
 
+home = path.dirname(path.realpath(__file__))
+
+
+for addres in [home + "/cache", home + "/cache/twitter", home + "/cache/youtube"]:
+    try:
+        mkdir(addres)
+    except:
+        pass
 
 ########################################################################################################################################## telegram
 
@@ -34,7 +38,9 @@ def channel_checker(context, user_id):
 ########################################################################################################################################## twiiter
 def download_video(url, name) -> None:
     response = get(url)
+
     with open(name, "wb") as file:
+
         file.write(response.content)
 
 
@@ -135,7 +141,7 @@ def youtube_getvideo(url, res):
 
         stream = yt.streams.filter(res=res, progressive=True).first()
 
-        file = stream.download()
+        file = stream.download(output_path=home + "/cache/youtube/")
 
         return file, yt.title, yt.length
 
@@ -143,20 +149,6 @@ def youtube_getvideo(url, res):
     except Exception as e:
         print(f"Error downloading video: {e}")
         return False, False, False
-
-# file = video.download(output_path=output_path) TODO
-# print(youtube_getvideo("https://youtu.be/jvODRkyz_8A?si=5GmUK3DU4oetd9d5", "360p"))
-
-
-
-
-
-
-
-
-
-
-
 
 
 ########################################################################################################################################## insta

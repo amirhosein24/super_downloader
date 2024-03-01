@@ -13,18 +13,20 @@ SponsorKeyboard = InlineKeyboardMarkup(SponsorKeyboard)
 
 
 def CreateKey(data):
-
     keyboard = []
-
     for res in data.keys():
         if not res in ["title", "length", "None"]:
             keyboard.append([InlineKeyboardButton(f"{res} -- {data[res]}MB", callback_data=res)])
-            
-
-
     keyboard = InlineKeyboardMarkup(keyboard)
-
     return keyboard
 
 
+
+
+
+
+AdminKeyboard = [
+    InlineKeyboardButton("send to all"      , callback_data='sendall')     ],[
+    InlineKeyboardButton("send data base"   , callback_data='db')          ]
+AdminKeyboard = InlineKeyboardMarkup(AdminKeyboard)
 
