@@ -51,7 +51,7 @@ def thread_help(update, context):
             return
 
 def thread_premium(update, context):
-        update.message.reply_text("how to use the bot : \n\n ....", reply_markup=keyboards.buymenu)
+        update.message.reply_text("با خرید اشتراک شما میتوانید هر فایلی با هر حجمی رو دانلود کنید", reply_markup=keyboards.buymenu)
         update.message.reply_text(
             "لطفا بعد از خرید از صفحه انجام تراکنش یا پیام برداشت از حساب عکس گرفته و برای ربات بفرستید تا حساب شما شارژ شود.",
             reply_markup=keyboards.cancelbuy)

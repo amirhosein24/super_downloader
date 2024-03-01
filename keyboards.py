@@ -29,9 +29,9 @@ AdminKeyboard = InlineKeyboardMarkup(AdminKeyboard)
 
 
 buymenu = [
-    [InlineKeyboardButton("1 ساعت تایپ : 9,000 تومان", url='https://zarinp.al/544882')],
-    [InlineKeyboardButton("3 ساعت تایپ : 25,000 تومان", url="https://zarinp.al/544884")],
-    [InlineKeyboardButton("10 ساعت تایپ : 80,000 تومان", url="https://zarinp.al/544885")]]
+    [InlineKeyboardButton("1 ماه : 49,000 تومان", url='https://zarinp.al/544899 ')],
+    [InlineKeyboardButton("3 ماه : 119,000 تومان", url="https://zarinp.al/576440")],
+    [InlineKeyboardButton("6 ماه : 290,000 تومان", url="https://zarinp.al/576441")]]
 buymenu = InlineKeyboardMarkup(buymenu)
 
 
