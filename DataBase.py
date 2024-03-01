@@ -88,6 +88,7 @@ def add_user(chat_id, username, firstname, lastname):
             firstname=firstname,
             lastname=lastname,
             timejoined=datetime.now(),
+            usageNum=0
         )
 
         session.add(new_user)

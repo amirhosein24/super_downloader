@@ -8,21 +8,15 @@ import DataBase as db
 from time import sleep
 from os import remove, path
 
-
-
-from telethon.tl.types import DocumentAttributeVideo
-from telethon import TelegramClient
-
-from threading import Thread, enumerate
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 from asyncio import new_event_loop, set_event_loop
+from threading import Thread, enumerate
+
+from telethon import TelegramClient
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 
 
 
 home = path.dirname(path.realpath(__file__)) + "/"
-
-
-
 
 
 
@@ -58,7 +52,6 @@ def thread_help(update, context):
 
 def thread_premium(update, context):
         update.message.reply_text("how to use the bot : \n\n ....", reply_markup=keyboards.buymenu)
-
         update.message.reply_text(
             "لطفا بعد از خرید از صفحه انجام تراکنش یا پیام برداشت از حساب عکس گرفته و برای ربات بفرستید تا حساب شما شارژ شود.",
             reply_markup=keyboards.cancelbuy)
@@ -82,9 +75,8 @@ def thread_link_manager(update, context):
                                        reply_markup=keyboards.RemoveKeys)
 
 
-
-
-        elif (link.startswith("https://x.com") or link.startswith("https://twitter.com")):      # twitter section
+        # twitter section
+        elif (link.startswith("https://x.com") or link.startswith("https://twitter.com")):      
 
             url, caption = methods.create_url(context, link)
             if not url:
@@ -102,11 +94,11 @@ def thread_link_manager(update, context):
             else: # if its a group video
                 run_filesender(file_sender(chat_id, file_names, caption))
             context.bot.deleteMessage(chat_id=chat_id, message_id=wait_message.message_id)
+            context.bot.send_message(chat_id=chat_id, text="""（づ￣3￣）づ╭❤️～""", reply_markup=keyboards.SponsorKeyboard)
             db.AddUsageNum(chat_id)
-            context.bot.send_message(chat_id=chat_id, text="""------ ( *︾▽︾)""", reply_markup=keyboards.SponsorKeyboard)
 
-
-        elif link.startswith("https://www.youtube.com") or link.startswith("https://youtu.be") or link.startswith("https://youtube.com"):      # youtube section
+        # youtube section
+        elif link.startswith("https://www.youtube.com") or link.startswith("https://youtu.be") or link.startswith("https://youtube.com"):      
             wait_message = context.bot.send_message(chat_id=chat_id, text="در حال پردازش ...", reply_to_message_id=update.message.message_id)
             data, working = methods.youtube_getinfo(link)
             if data and working:
@@ -114,27 +106,26 @@ def thread_link_manager(update, context):
             elif not working:
                 context.bot.edit_message_text(chat_id=chat_id, message_id=wait_message.message_id, text="this video cant be downloaded")
                 context.bot.send_message(chat_id=creds.Admin, text=data)
-
-
-
-
-        else: #dwonload from direct link
-            file_size = methods.get_file_size(link)
+        #dwonload from direct link
+        else: 
+            try:
+                file_size = methods.get_file_size(link)
+            except:
+                context.bot.send_message(chat_id=chat_id, text="لینک درست شناسایی نشد, از صحت لینک دانلود فایل مطمن شوید")
+                return
 
             if file_size > 100 :
                 print(db.is_prem(chat_id))
                 if not db.is_prem(chat_id):        
-                    context.bot.send_message(chat_id=chat_id, text="حجم فایل مورد نظر بیشتر از ۱۰۰ مگابایت است")
+                    context.bot.send_message(chat_id=chat_id, text="برای دانلود فایل ها با حجم بالاتر از ۱۰۰ مگابایت به اشتراک پریمیوم نیاز دارید\n از دستور /premium استفاده کنید")
                     return
                 
             wait_message = context.bot.send_message(chat_id=chat_id, text="در حال دانلود ...", reply_to_message_id=update.message.message_id)
             file = methods.downloader(link)
             context.bot.edit_message_text(chat_id=chat_id, message_id=wait_message.message_id, text="فایل دانلود شد,  در حال آپلود ...")
             run_filesender(file_sender(chat_id, home + "cache/other/" + file))
+            context.bot.send_message(chat_id=chat_id, text="""（づ￣3￣）づ╭❤️～""", reply_markup=keyboards.SponsorKeyboard)
             context.bot.deleteMessage(chat_id=chat_id, message_id=wait_message.message_id)
-
-
-            context.bot.send_message(chat_id=chat_id, text="""------ ( *︾▽︾)""", reply_markup=keyboards.SponsorKeyboard)
 
     except Exception as error:
         
@@ -158,8 +149,12 @@ async def file_sender(chat_id, file_path, caption=None):
 
     async with TelegramClient(home + "telethon", creds.ApiId, creds.ApiHash) as client:
 
+        if caption:
+            caption = f"{caption}\n\n<a href='https://t.me/x_downloadbot'>Downloader Bot | ربات دانلودر </a>"
+        else:
+            caption = "<a href='https://t.me/x_downloadbot'>Downloader Bot | ربات دانلودر </a>"
         try:
-            await client.send_message(chat_id, message=caption, file=file_path)
+            await client.send_message(chat_id, message=caption, parse_mode='html', link_preview=False, file=file_path)
 
         except Exception as error:
             await client.send_message(chat_id, "ی مشکلی پیش اومد ببشید, دوباره بفرست برام شاید تونستم")
@@ -219,7 +214,7 @@ def thread_callback(update, context):
 
                 if next(generator) > 100:
 
-                    context.bot.send_message(chat_id=chat_id, text="حجم فایل مورد نظر بیشتر از ۱۰۰ مگابایت است")
+                    context.bot.send_message(chat_id=chat_id, text="برای دانلود فایل ها با حجم بالاتر از ۱۰۰ مگابایت به اشتراک پریمیوم نیاز دارید\n از دستور /premium استفاده کنید")
                     return
 
                 query.edit_message_text("دانلود شروع شد ...")
@@ -228,6 +223,7 @@ def thread_callback(update, context):
                 query.edit_message_text("دانلود تمام شد , در حال آپلود...")
 
                 run_filesender(file_sender(chat_id, file_path, title))
+                context.bot.send_message(chat_id=chat_id, text="""（づ￣3￣）づ╭❤️～""", reply_markup=keyboards.SponsorKeyboard)
                 
                 context.bot.delete_message(chat_id=chat_id, message_id=query.message.message_id)
 
@@ -244,15 +240,10 @@ def thread_callback(update, context):
                 elif command == "db":
                     context.bot.send_document(chat_id=chat_id, document=open(home+'db.sqlite', "rb"))
 
-
-
-
-
                 elif command.startswith("month"):
 
                     month = int(command.split("-")[1])
                     user = query.message.caption
-                    
                     
                     try:
                         db.add_prem(user, month)
@@ -260,14 +251,10 @@ def thread_callback(update, context):
                             context.bot.send_message(chat_id=user, text=f"اعتبار حساب شما افزایش پیدا نکرد، از صحت عکس ارسالی مطمئن شوید.")
                         else:
                             context.bot.send_message(chat_id=user, text=f"حساب شا {month} ماه شارژ شد")
-                
-                        context.bot.edit_message_caption(
-                            caption=f"{query.data} added to {user}", 
-                            chat_id=chat_id, message_id=query.message.message_id)
-                        
+                        context.bot.edit_message_caption(chat_id=chat_id, caption=f"{query.data} added to {user}", message_id=query.message.message_id)
+    
                     except Exception as error:
                         context.bot.send_message(chat_id=chat_id, text=f"error in add month\n error : {error}")
-
 
         except Exception as error:     
             print(error)
@@ -305,6 +292,10 @@ def start(update, context):
 def link_manager(update, context):
     if not active_thread(str(update.message.chat_id)): # makes user use one download at a time
         Thread(target=thread_link_manager, args=(update, context, ), name=str(update.message.chat_id)).start()
+    else:
+        update.message.reply_text("لطفا صبر کنید تا فایل قبل دانلود شود.")
+
+
 
 def help(update, context):
     Thread(target=thread_help, args=(update, context, )).start()
