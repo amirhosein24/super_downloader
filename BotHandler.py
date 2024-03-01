@@ -274,7 +274,7 @@ def thread_forward(update, context):
         if update.message.caption:
             context.bot.send_message(chat_id=creds.Admin, text=update.message.caption,
                                     reply_to_message_id=pic.message_id)
-        update.message.reply_text("در حال برسی, چند دقیقه صبر کنید ...", reply_to_message_id=update.message.message_id)
+        update.message.reply_text("در حال برسی, چند دقیقه صبر کنید ...", reply_to_message_id=update.message.message_id, reply_markup=keyboards.RemoveKeys)
         return
 
     except Exception as error:
