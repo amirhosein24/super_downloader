@@ -250,7 +250,7 @@ def thread_callback(update, context):
                         if month == 0 :
                             context.bot.send_message(chat_id=user, text=f"اعتبار حساب شما افزایش پیدا نکرد، از صحت عکس ارسالی مطمئن شوید.")
                         else:
-                            context.bot.send_message(chat_id=user, text=f"حساب شا {month} ماه شارژ شد")
+                            context.bot.send_message(chat_id=user, text=f"حساب شما {month} ماه شارژ شد")
                         context.bot.edit_message_caption(chat_id=chat_id, caption=f"{query.data} added to {user}", message_id=query.message.message_id)
     
                     except Exception as error:
