@@ -106,6 +106,23 @@ def thread_link_manager(update, context):
             elif not working:
                 context.bot.edit_message_text(chat_id=chat_id, message_id=wait_message.message_id, text="this video cant be downloaded")
                 context.bot.send_message(chat_id=creds.Admin, text=data)
+
+
+
+
+        elif link.startswith("https://www.instagram.com") or link.startswith("https://instagram.com"):      
+
+
+
+
+
+
+            pass
+
+
+
+
+
         #dwonload from direct link
         else: 
             try:

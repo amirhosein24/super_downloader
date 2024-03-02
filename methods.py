@@ -10,7 +10,7 @@ from requests import get, head
 home = path.dirname(path.realpath(__file__)) + "/"
 
 
-for addres in [home + "cache", home + "cache/twitter", home + "cache/youtube", home + "cache/other"]:
+for addres in [home + "cache", home + "cache/twitter", home + "cache/youtube", home + "cache/insta", home + "cache/other"]:
     try:
         mkdir(addres)
     except:
@@ -100,14 +100,10 @@ def youtube_getvideo(url, res):
         yt = YouTube(url)
 
         stream = yt.streams.filter(res=res, progressive=True).first()
-
         yield int(stream.filesize / (1024 * 1024))
 
-
         file = stream.download(output_path=home + "cache/youtube/")
-
         yield file, yt.title
-
 
     except Exception as e:
         print(f"Error downloading video: {e}")
@@ -118,31 +114,29 @@ def youtube_getvideo(url, res):
 import instaloader
 
 def download_instagram_post(url):
-    """Downloads the Instagram post from the provided URL and saves it to the specified target directory.
-
-    Args:
-        url (str): The URL of the Instagram post to download.
-
-    Raises:
-        instaloader.ProfileNotExistsException: If the profile specified in the target directory does not exist.
-        instaloader.Post.NotAPostException: If the provided URL doesn't point to a valid Instagram post.
-    """
-
-    # Create an instance of Instaloader
     loader = instaloader.Instaloader()
+    
+    
+    shortcode = url.split("/")[-2]
+    
 
-    # Extract the username from the URL
-    username = url.split("/")[-2]
+    post = instaloader.Post.from_shortcode(loader.context, shortcode)
+    
+    print(post)
 
-    # Load the post metadata
-    post = instaloader.Post.from_shortcode(loader.context, url)
+    for item in post:
+       print(item)
 
-    # Download the post and save it to the specified target directory
-    loader.download_post(post, target=username)  # Use the extracted username as the target directory
+    x = loader.download_post(post, target= "cache//insta")
 
-# Example usage
-url = "https://www.instagram.com/reel/C3-wFp7rI45/?utm_source=ig_web_copy_link"
-download_instagram_post(url)
+    print(x) #prints true if download is successful
+
+
+
+download_instagram_post("https://www.instagram.com/p/C1kmeVVs4mF/?utm_source=ig_web_copy_link")
+
+
+
 
 
 
@@ -152,8 +146,6 @@ download_instagram_post(url)
 ########################################################################################################################################## link 2 file4
 
 from urllib.parse import urlparse
-
-
 
 
 def downloader(url):
@@ -180,8 +172,6 @@ def downloader(url):
 
 
 def get_file_size(url):
-
-
   response = head(url, allow_redirects=True)
 
   if response.status_code == 200:
