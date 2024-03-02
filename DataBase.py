@@ -39,42 +39,55 @@ def is_prem(chat_id):
     user_data = session.query(UserData).filter_by(chat_id=chat_id).first()
     
     if user_data:
-    
         till = user_data.prem
         session.close()
     
-        if user_data.prem:
-
+        if till:
             now = datetime.strptime(datetime.now().strftime('%Y/%m/%d'), '%Y/%m/%d')
 
             if now <= till:
                 return True
             elif now > till:
                 return False
+        print("---")
         return False
     else:
         return False
 
-
-
 #  add to prem time  ############################################################################################################################################
 def add_prem(chat_id, month):
-    Session = sessionmaker(bind=engine)
-    session = Session()
 
-    user_data = session.query(UserData).filter_by(chat_id=chat_id).first()
 
-    if user_data:
-        current_date = datetime.now().date()
-        future_date = current_date + timedelta(days=month*31)
+    if is_prem(chat_id):
+
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+        user_data = session.query(UserData).filter_by(chat_id=chat_id).first()
+        print("gogogo")
+        future_date = user_data.prem + timedelta(days=month*31)
         user_data.prem = future_date
         session.commit()
         session.close()
         return True
+    
+    else:
 
-    session.close()
-    return False
+        Session = sessionmaker(bind=engine)
+        session = Session()
 
+        user_data = session.query(UserData).filter_by(chat_id=chat_id).first()
+
+        if user_data:
+            current_date = datetime.now().date()
+            future_date = current_date + timedelta(days=month*31)
+            user_data.prem = future_date
+            session.commit()
+            session.close()
+            return True
+
+        session.close()
+        return False
 
 
 # function to add user  ########################################################################################################################### 

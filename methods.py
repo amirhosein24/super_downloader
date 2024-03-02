@@ -115,6 +115,37 @@ def youtube_getvideo(url, res):
 
 
 ########################################################################################################################################## insta
+import instaloader
+
+def download_instagram_post(url):
+    """Downloads the Instagram post from the provided URL and saves it to the specified target directory.
+
+    Args:
+        url (str): The URL of the Instagram post to download.
+
+    Raises:
+        instaloader.ProfileNotExistsException: If the profile specified in the target directory does not exist.
+        instaloader.Post.NotAPostException: If the provided URL doesn't point to a valid Instagram post.
+    """
+
+    # Create an instance of Instaloader
+    loader = instaloader.Instaloader()
+
+    # Extract the username from the URL
+    username = url.split("/")[-2]
+
+    # Load the post metadata
+    post = instaloader.Post.from_shortcode(loader.context, url)
+
+    # Download the post and save it to the specified target directory
+    loader.download_post(post, target=username)  # Use the extracted username as the target directory
+
+# Example usage
+url = "https://www.instagram.com/reel/C3-wFp7rI45/?utm_source=ig_web_copy_link"
+download_instagram_post(url)
+
+
+
 
 ########################################################################################################################################## tiktok
 

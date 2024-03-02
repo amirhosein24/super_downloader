@@ -114,11 +114,10 @@ def thread_link_manager(update, context):
                 context.bot.send_message(chat_id=chat_id, text="لینک درست شناسایی نشد, از صحت لینک دانلود فایل مطمن شوید")
                 return
 
-            if file_size > 100 :
-                print(db.is_prem(chat_id))
-                if not db.is_prem(chat_id):        
-                    context.bot.send_message(chat_id=chat_id, text="برای دانلود فایل ها با حجم بالاتر از ۱۰۰ مگابایت به اشتراک پریمیوم نیاز دارید\n از دستور /premium استفاده کنید")
-                    return
+            if file_size > 100 and not db.is_prem(chat_id):
+            
+                context.bot.send_message(chat_id=chat_id, text="برای دانلود فایل ها با حجم بالاتر از ۱۰۰ مگابایت به اشتراک پریمیوم نیاز دارید\n از دستور /premium استفاده کنید")
+                return
                 
             wait_message = context.bot.send_message(chat_id=chat_id, text="در حال دانلود ...", reply_to_message_id=update.message.message_id)
             file = methods.downloader(link)
@@ -212,8 +211,7 @@ def thread_callback(update, context):
                 generator = methods.youtube_getvideo(query.message.reply_to_message.text, command.split("-")[1])
 
 
-                if next(generator) > 100:
-
+                if next(generator) > 100 and not db.is_prem(chat_id):
                     context.bot.send_message(chat_id=chat_id, text="برای دانلود فایل ها با حجم بالاتر از ۱۰۰ مگابایت به اشتراک پریمیوم نیاز دارید\n از دستور /premium استفاده کنید")
                     return
 

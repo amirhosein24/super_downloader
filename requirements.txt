@@ -3,3 +3,4 @@ SQLAlchemy
 bs4
 requests
 pytube
+instaloader
