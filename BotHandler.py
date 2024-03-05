@@ -6,8 +6,9 @@ import DataBase as db
 
 
 from time import sleep
-from os import remove, path
+from os import remove, path, listdir, rename
 
+from pathlib import Path
 from asyncio import new_event_loop, set_event_loop
 from threading import Thread, enumerate
 
@@ -113,17 +114,23 @@ def thread_link_manager(update, context):
         elif link.startswith("https://www.instagram.com") or link.startswith("https://instagram.com"):      
 
 
+            wait_message = context.bot.send_message(chat_id=chat_id, text="در حال پردازش ...", reply_to_message_id=update.message.message_id)
+
+            address = methods.insta_down(link)
+            # address = "C:/Users/amhei/Documents/GitHub/telegram/X_downloader\cache\insta\playwright-artifacts-j49aQc"
+
+            print(address)
+            for item in listdir(address):
+                rename(address +"/"+ item, address +"/"+ item+".jpg")
+
+            files = [address +"/"+ item for item in listdir(address)]
+
+            run_filesender(file_sender(chat_id, files, None))
 
 
+            context.bot.send_message(chat_id=chat_id, text="""（づ￣3￣）づ╭❤️～""", reply_markup=keyboards.SponsorKeyboard)
+            context.bot.delete_message(chat_id=chat_id, message_id=wait_message.message_id)
 
-
-            pass
-
-
-
-
-
-        #dwonload from direct link
         else: 
             try:
                 file_size = methods.get_file_size(link)
@@ -298,8 +305,17 @@ def thread_forward(update, context):
 
 
 
-#########################################################################################
-#########################################################################################
+
+
+
+
+
+
+
+
+
+###########################################################################################################################################################
+###########################################################################################################################################################
 
 def start(update, context):
     Thread(target=thread_start, args=(update, context, )).start()

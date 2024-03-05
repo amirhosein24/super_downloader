@@ -1,4 +1,3 @@
-
 def load_json():
     
     from json import load

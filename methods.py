@@ -3,12 +3,7 @@ from creds import ForceJoinId, Admin
 from os import mkdir, path
 from requests import get, head
 
-
-
-
-
 home = path.dirname(path.realpath(__file__)) + "/"
-
 
 for addres in [home + "cache", home + "cache/twitter", home + "cache/youtube", home + "cache/insta", home + "cache/other"]:
     try:
@@ -111,35 +106,45 @@ def youtube_getvideo(url, res):
 
 
 ########################################################################################################################################## insta
-import instaloader
+from playwright.sync_api import Playwright, sync_playwright
+import os
+# from time import sleep
+def playwright_downer(playwright: Playwright, url:str):
+    try:
+        browser = playwright.chromium.launch(headless=True)
+        context = browser.new_context()
+        page = context.new_page()
+        page.goto("https://publer.io/tools/instagram-video-downloader")
+        
+        
+        page.get_by_placeholder("https://").fill(url)
+        page.get_by_role("button", name="Download").click()
 
-def download_instagram_post(url):
-    loader = instaloader.Instaloader()
-    
-    
-    shortcode = url.split("/")[-2]
-    
+        with page.expect_download() as download_info:
+            page.get_by_text("Download to your device").click()
+        try:
+            page.wait_for_selector('text="Download to your device"', timeout=10000)
+        except Exception as e:
+            print(e)
 
-    post = instaloader.Post.from_shortcode(loader.context, shortcode)
-    
-    print(post)
+        download = download_info.value
 
-    for item in post:
-       print(item)
+        directory_path = os.path.dirname(download.path())
+        new_path = os.path.join(home + "cache/insta/", os.path.basename(directory_path))
 
-    x = loader.download_post(post, target= "cache//insta")
+        os.rename(directory_path, new_path)
 
-    print(x) #prints true if download is successful
+        context.close()
+        browser.close()
+        return new_path
 
+    except Exception as e:
+        print(e)
+        return None
 
-
-download_instagram_post("https://www.instagram.com/p/C1kmeVVs4mF/?utm_source=ig_web_copy_link")
-
-
-
-
-
-
+def insta_down(url):
+    with sync_playwright() as playwright:
+        return playwright_downer(playwright, url)
 
 ########################################################################################################################################## tiktok
 
