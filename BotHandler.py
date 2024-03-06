@@ -98,11 +98,13 @@ def thread_link_manager(update, context):
         # instagram section
         elif link.startswith("https://www.instagram.com") or link.startswith("https://instagram.com"):      
 
-            wait_message = context.bot.send_message(chat_id=chat_id, text="در حال پردازش ...", reply_to_message_id=update.message.message_id)
-            file_list, caption = methods.download_insta(chat_id, link)
-            run_filesender(file_sender(chat_id, file_list, caption))
-            context.bot.send_message(chat_id=chat_id, text="""（づ￣3￣）づ╭❤️～""", reply_markup=keyboards.SponsorKeyboard)
-            context.bot.delete_message(chat_id=chat_id, message_id=wait_message.message_id)
+            context.bot.send_message(chat_id=chat_id, text="در حال حاضر دانلود اینستاگرام غیر فعال میباشد.", reply_to_message_id=update.message.message_id)
+
+            # wait_message = context.bot.send_message(chat_id=chat_id, text="در حال پردازش ...", reply_to_message_id=update.message.message_id)
+            # file_list, caption = methods.download_insta(chat_id, link)
+            # run_filesender(file_sender(chat_id, file_list, caption))
+            # context.bot.send_message(chat_id=chat_id, text="""（づ￣3￣）づ╭❤️～""", reply_markup=keyboards.SponsorKeyboard)
+            # context.bot.delete_message(chat_id=chat_id, message_id=wait_message.message_id)
 
 
         else:
