@@ -12,7 +12,8 @@ def load_json():
     Sponsor = config["Sponsor"]
     ApiId = config["ApiId"]
     ApiHash = config["ApiHash"]
+    Instagram = config["Instagram"]
 
-    return Admin, BotToken, ForceJoin, ForceJoinId, Sponsor, ApiId, ApiHash
+    return Admin, BotToken, ForceJoin, ForceJoinId, Sponsor, ApiId, ApiHash, Instagram
 
-Admin, BotToken, ForceJoin, ForceJoinId, Sponsor, ApiId, ApiHash = load_json()
+Admin, BotToken, ForceJoin, ForceJoinId, Sponsor, ApiId, ApiHash, Instagram = load_json()

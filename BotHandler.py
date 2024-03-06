@@ -1,25 +1,18 @@
-
 import creds
 import methods
 import keyboards
 import DataBase as db
 
-
 from time import sleep
 from os import remove, path, listdir, rename
 
-from pathlib import Path
 from asyncio import new_event_loop, set_event_loop
 from threading import Thread, enumerate
 
 from telethon import TelegramClient
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 
-
-
 home = path.dirname(path.realpath(__file__)) + "/"
-
-
 
 def active_thread(name):
     for thread in enumerate():
@@ -43,8 +36,6 @@ def thread_start(update, context):
         except Exception as error:
             context.bot.send_message(chat_id=creds.Admin, text=f"Error in thread_start by {chat_id}\nerror : \n{error}")
 
-
-
 def thread_help(update, context):
         update.message.reply_text("how to use the bot : \n\n ....")
         if not methods.channel_checker(context, update.message.chat_id):
@@ -64,17 +55,13 @@ def thread_link_manager(update, context):
         chat_id = update.message.chat_id
         link    = update.message.text
 
-
         if not methods.channel_checker(context, chat_id):
             update.message.reply_text('لطفا برای استفاده از ربات در کانال ما جوین شوید. :)', reply_markup=keyboards.ForceJoinKeyboard, reply_to_message_id=update.message.message_id)
             return
 
-
         if link == "❌ لغو خرید ❌":
-
             update.message.reply_text(f"سلام {update.message.chat.first_name}, به ربات دانلودر توییتر خوش آومدی \nلینک توییتت رو بفرست اینجا تا برات فیلم هاشو بفرستم",
                                        reply_markup=keyboards.RemoveKeys)
-
 
         # twitter section
         elif (link.startswith("https://x.com") or link.startswith("https://twitter.com")):      
@@ -108,30 +95,18 @@ def thread_link_manager(update, context):
                 context.bot.edit_message_text(chat_id=chat_id, message_id=wait_message.message_id, text="this video cant be downloaded")
                 context.bot.send_message(chat_id=creds.Admin, text=data)
 
-
-
-
+        # instagram section
         elif link.startswith("https://www.instagram.com") or link.startswith("https://instagram.com"):      
 
-
             wait_message = context.bot.send_message(chat_id=chat_id, text="در حال پردازش ...", reply_to_message_id=update.message.message_id)
-
-            address = methods.insta_down(link)
-            # address = "C:/Users/amhei/Documents/GitHub/telegram/X_downloader\cache\insta\playwright-artifacts-j49aQc"
-
-            print(address)
-            for item in listdir(address):
-                rename(address +"/"+ item, address +"/"+ item+".jpg")
-
-            files = [address +"/"+ item for item in listdir(address)]
-
-            run_filesender(file_sender(chat_id, files, None))
-
-
+            file_list, caption = methods.download_insta(chat_id, link)
+            run_filesender(file_sender(chat_id, file_list, caption))
             context.bot.send_message(chat_id=chat_id, text="""（づ￣3￣）づ╭❤️～""", reply_markup=keyboards.SponsorKeyboard)
             context.bot.delete_message(chat_id=chat_id, message_id=wait_message.message_id)
 
-        else: 
+
+        else:
+            
             try:
                 file_size = methods.get_file_size(link)
             except:
@@ -139,7 +114,6 @@ def thread_link_manager(update, context):
                 return
 
             if file_size > 100 and not db.is_prem(chat_id):
-            
                 context.bot.send_message(chat_id=chat_id, text="برای دانلود فایل ها با حجم بالاتر از ۱۰۰ مگابایت به اشتراک پریمیوم نیاز دارید\n از دستور /premium استفاده کنید")
                 return
                 
@@ -167,24 +141,25 @@ def thread_link_manager(update, context):
         #     pass
 
 
+
+
+
+
+
 async def file_sender(chat_id, file_path, caption=None):
-
-
     async with TelegramClient(home + "telethon", creds.ApiId, creds.ApiHash) as client:
 
         if caption:
             caption = f"{caption}\n\n<a href='https://t.me/x_downloadbot'>Downloader Bot | ربات دانلودر </a>"
         else:
             caption = "<a href='https://t.me/x_downloadbot'>Downloader Bot | ربات دانلودر </a>"
+
         try:
             await client.send_message(chat_id, message=caption, parse_mode='html', link_preview=False, file=file_path)
-
         except Exception as error:
             await client.send_message(chat_id, "ی مشکلی پیش اومد ببشید, دوباره بفرست برام شاید تونستم")
             await client.send_message(creds.Admin, f"error in file_sender by {chat_id}\nerror:\n{error}")
-            print("--------")
             print(error)
-
 
         finally:
             if isinstance(file_path, list):
@@ -202,22 +177,13 @@ def run_filesender(coro):
     loop.run_until_complete(coro)
 
 
-
-
-
-
-
-
-
 def thread_callback(update, context):
 
         query = update.callback_query
         chat_id = query.message.chat_id
         command = query.data
 
-
         try:
-
             if command == 'joined':
                 if methods.channel_checker(context, chat_id):
                     query.edit_message_text("ربات فعال شد الان میتونی استفاده کنی ")
@@ -234,21 +200,16 @@ def thread_callback(update, context):
 
                 generator = methods.youtube_getvideo(query.message.reply_to_message.text, command.split("-")[1])
 
-
                 if next(generator) > 100 and not db.is_prem(chat_id):
                     context.bot.send_message(chat_id=chat_id, text="برای دانلود فایل ها با حجم بالاتر از ۱۰۰ مگابایت به اشتراک پریمیوم نیاز دارید\n از دستور /premium استفاده کنید")
                     return
 
                 query.edit_message_text("دانلود شروع شد ...")
-                file_path, title = next(generator)
-    
+                file_path, title = next(generator)    
                 query.edit_message_text("دانلود تمام شد , در حال آپلود...")
-
                 run_filesender(file_sender(chat_id, file_path, title))
                 context.bot.send_message(chat_id=chat_id, text="""（づ￣3￣）づ╭❤️～""", reply_markup=keyboards.SponsorKeyboard)
-                
                 context.bot.delete_message(chat_id=chat_id, message_id=query.message.message_id)
-
                 if path.isfile(file_path):
                     remove(file_path)
 
@@ -290,28 +251,16 @@ def thread_forward(update, context):
     chat_id = update.message.chat_id
 
     try:
-        
         photo_id = update.message.photo[-1].file_id
         pic = context.bot.send_photo(chat_id=creds.Admin, photo=photo_id, caption=chat_id, reply_markup=keyboards.admin_addmenu)
         if update.message.caption:
-            context.bot.send_message(chat_id=creds.Admin, text=update.message.caption,
-                                    reply_to_message_id=pic.message_id)
+            context.bot.send_message(chat_id=creds.Admin, text=update.message.caption, reply_to_message_id=pic.message_id)
         update.message.reply_text("در حال برسی, چند دقیقه صبر کنید ...", reply_to_message_id=update.message.message_id, reply_markup=keyboards.RemoveKeys)
         return
 
     except Exception as error:
         update.message.reply_text("مشکلی در سیستم پیش آمد, لطفا دوباره تلاش کنید.")
         context.bot.send_message(chat_id=creds.Admin, text=f"error in thread forward by {update.message.caption}\nerror : {error}")
-
-
-
-
-
-
-
-
-
-
 
 
 ###########################################################################################################################################################
@@ -325,8 +274,6 @@ def link_manager(update, context):
         Thread(target=thread_link_manager, args=(update, context, ), name=str(update.message.chat_id)).start()
     else:
         update.message.reply_text("لطفا صبر کنید تا فایل قبل دانلود شود.")
-
-
 
 def help(update, context):
     Thread(target=thread_help, args=(update, context, )).start()
@@ -358,7 +305,6 @@ def go_live():
         except Exception as e:
             print(f"Retrying in 10 sec... Error: {e}")
             sleep(10)
-
 
 if __name__ == "__main__":
     go_live()

@@ -1,4 +1,4 @@
-from creds import ForceJoinId, Admin
+from creds import ForceJoinId, Admin, Instagram
 
 from os import mkdir, path
 from requests import get, head
@@ -83,12 +83,62 @@ def youtube_getinfo(url):
         return data, True
 
     except Exception as error:
-
         return str(error), False
 
+# print(youtube_getinfo("https://youtube.com/shorts/JSRwORjv-BE?si=dAEDUV109k21Vd66"))
 
+# from googleapiclient.discovery import build
+# from google_auth_oauthlib.flow import InstalledAppFlow
+# from google.auth.transport.requests import Request
+# from google.oauth2.credentials import Credentials
+# import os
 
+# # Scopes required by the YouTube API
+# SCOPES = ['https://www.googleapis.com/auth/youtube.readonly']
 
+# def authenticate_youtube():
+#     creds = None
+#     # The file token.json stores the user's access and refresh tokens, and is
+#     # created automatically when the authorization flow completes for the first
+#     # time.
+#     if os.path.exists('token.json'):
+#         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+#     # If there are no (valid) credentials available, let the user log in.
+#     if not creds or not creds.valid:
+#         if creds and creds.expired and creds.refresh_token:
+#             creds.refresh(Request())
+#         else:
+#             flow = InstalledAppFlow.from_client_secrets_file(
+#                 'client_secrets.json', SCOPES)
+#             creds = flow.run_local_server(port=0)
+#         # Save the credentials for the next run
+#         with open('token.json', 'w') as token:
+#             token.write(creds.to_json())
+#     return build('youtube', 'v3', credentials=creds)
+
+# def youtube_getinfo(youtube, video_id):
+#     # Replace 'YOUR_VIDEO_ID' with the ID of the video you are trying to access
+#     request = youtube.videos().list(
+#         part='snippet,contentDetails,statistics',
+#         id=video_id
+#     )
+#     response = request.execute()
+    
+#     data = {}
+#     if response['items']:
+#         video = response['items'][0]
+#         data['title'] = video['snippet']['title']
+#         data['length'] = video['contentDetails']['duration']
+#         # ... Extract other data as needed
+
+#     return data
+
+# # Authenticate to YouTube API
+# youtube = authenticate_youtube()
+
+# # Call the function with a video ID
+# video_data = youtube_getinfo(youtube, "YOUR_VIDEO_ID")
+# print(video_data)
 
 def youtube_getvideo(url, res):
     try:
@@ -106,45 +156,48 @@ def youtube_getvideo(url, res):
 
 
 ########################################################################################################################################## insta
-from playwright.sync_api import Playwright, sync_playwright
-import os
-# from time import sleep
-def playwright_downer(playwright: Playwright, url:str):
-    try:
-        browser = playwright.chromium.launch(headless=True)
-        context = browser.new_context()
-        page = context.new_page()
-        page.goto("https://publer.io/tools/instagram-video-downloader")
+import requests
+import instagrapi
+
+client = instagrapi.Client()
+client.login(Instagram[0], Instagram[1])
+
+def download_insta(chat_id, url):
+    media_info = client.media_info(client.media_pk_from_url(url))
+    caption = media_info.caption_text
+    file_list  = []
+
+    if media_info.resources:
+        for index, item in enumerate(media_info.resources):
+            
+            if item.video_url :
+                download_url = item.video_url
+                filename = f"{chat_id}-{index}.mp4"
+            else:
+                download_url = item.thumbnail_url
+                filename = f"{chat_id}-{index}.jpg"
+
+            file_list.append(home + "cache/insta/" + filename)
+            response = requests.get(download_url)
+            with open(home + "cache/insta/" + filename, 'wb') as file:
+                file.write(response.content)
+    else:
         
-        
-        page.get_by_placeholder("https://").fill(url)
-        page.get_by_role("button", name="Download").click()
+        if media_info.video_url :
+            download_url = media_info.video_url
+            filename = f"{chat_id}.mp4"
+        else:
+            download_url = media_info.thumbnail_url
+            filename = f"{chat_id}.jpg"
 
-        with page.expect_download() as download_info:
-            page.get_by_text("Download to your device").click()
-        try:
-            page.wait_for_selector('text="Download to your device"', timeout=10000)
-        except Exception as e:
-            print(e)
+        file_list.append(home + "cache/insta/" + filename)
+        response = requests.get(download_url)
+        with open(home + "cache/insta/" + filename, 'wb') as file:
+            file.write(response.content)
 
-        download = download_info.value
+    return file_list, caption
 
-        directory_path = os.path.dirname(download.path())
-        new_path = os.path.join(home + "cache/insta/", os.path.basename(directory_path))
 
-        os.rename(directory_path, new_path)
-
-        context.close()
-        browser.close()
-        return new_path
-
-    except Exception as e:
-        print(e)
-        return None
-
-def insta_down(url):
-    with sync_playwright() as playwright:
-        return playwright_downer(playwright, url)
 
 ########################################################################################################################################## tiktok
 
@@ -154,7 +207,6 @@ from urllib.parse import urlparse
 
 
 def downloader(url):
-
   response = get(url, allow_redirects=True)
 
   if response.status_code == 200:
