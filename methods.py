@@ -156,10 +156,10 @@ def youtube_getvideo(url, res):
 
 
 ########################################################################################################################################## insta
-import requests
-import instagrapi
 
-client = instagrapi.Client()
+from instagrapi import Client
+
+client = Client()
 client.login(Instagram[0], Instagram[1])
 
 def download_insta(chat_id, url):
@@ -178,7 +178,7 @@ def download_insta(chat_id, url):
                 filename = f"{chat_id}-{index}.jpg"
 
             file_list.append(home + "cache/insta/" + filename)
-            response = requests.get(download_url)
+            response = get(download_url)
             with open(home + "cache/insta/" + filename, 'wb') as file:
                 file.write(response.content)
     else:
@@ -191,7 +191,7 @@ def download_insta(chat_id, url):
             filename = f"{chat_id}.jpg"
 
         file_list.append(home + "cache/insta/" + filename)
-        response = requests.get(download_url)
+        response = get(download_url)
         with open(home + "cache/insta/" + filename, 'wb') as file:
             file.write(response.content)
 
