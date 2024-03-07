@@ -12,7 +12,6 @@ for addres in [home + "cache", home + "cache/twitter", home + "cache/youtube", h
         pass
 
 ########################################################################################################################################## telegram
-
 def channel_checker(context, user_id):
     try:
         for channel in ForceJoinId.values():
@@ -24,8 +23,6 @@ def channel_checker(context, user_id):
     except Exception as e:
         context.bot.send_message(chat_id=Admin, text=f"Error in channel checker by {user_id}:\nError : \n{e}")
         return True
-
-
 
 ########################################################################################################################################## twiiter
 from bs4 import BeautifulSoup
@@ -59,13 +56,9 @@ def create_url(context, url):
         context.bot.send_message(chat_id=Admin, text=f"Error in create url : {url}\n\nerror : \n{error}")
         return False, False 
 
-
-
 ########################################################################################################################################## youtube
 from pytube import YouTube
 from datetime import timedelta
-
-
 
 def youtube_getinfo(url):
     try:
@@ -85,61 +78,6 @@ def youtube_getinfo(url):
     except Exception as error:
         return str(error), False
 
-# print(youtube_getinfo("https://youtube.com/shorts/JSRwORjv-BE?si=dAEDUV109k21Vd66"))
-
-# from googleapiclient.discovery import build
-# from google_auth_oauthlib.flow import InstalledAppFlow
-# from google.auth.transport.requests import Request
-# from google.oauth2.credentials import Credentials
-# import os
-
-# # Scopes required by the YouTube API
-# SCOPES = ['https://www.googleapis.com/auth/youtube.readonly']
-
-# def authenticate_youtube():
-#     creds = None
-#     # The file token.json stores the user's access and refresh tokens, and is
-#     # created automatically when the authorization flow completes for the first
-#     # time.
-#     if os.path.exists('token.json'):
-#         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-#     # If there are no (valid) credentials available, let the user log in.
-#     if not creds or not creds.valid:
-#         if creds and creds.expired and creds.refresh_token:
-#             creds.refresh(Request())
-#         else:
-#             flow = InstalledAppFlow.from_client_secrets_file(
-#                 'client_secrets.json', SCOPES)
-#             creds = flow.run_local_server(port=0)
-#         # Save the credentials for the next run
-#         with open('token.json', 'w') as token:
-#             token.write(creds.to_json())
-#     return build('youtube', 'v3', credentials=creds)
-
-# def youtube_getinfo(youtube, video_id):
-#     # Replace 'YOUR_VIDEO_ID' with the ID of the video you are trying to access
-#     request = youtube.videos().list(
-#         part='snippet,contentDetails,statistics',
-#         id=video_id
-#     )
-#     response = request.execute()
-    
-#     data = {}
-#     if response['items']:
-#         video = response['items'][0]
-#         data['title'] = video['snippet']['title']
-#         data['length'] = video['contentDetails']['duration']
-#         # ... Extract other data as needed
-
-#     return data
-
-# # Authenticate to YouTube API
-# youtube = authenticate_youtube()
-
-# # Call the function with a video ID
-# video_data = youtube_getinfo(youtube, "YOUR_VIDEO_ID")
-# print(video_data)
-
 def youtube_getvideo(url, res):
     try:
         yt = YouTube(url)
@@ -153,7 +91,6 @@ def youtube_getvideo(url, res):
     except Exception as e:
         print(f"Error downloading video: {e}")
         yield False, False
-
 
 ########################################################################################################################################## insta
 
@@ -202,15 +139,14 @@ def youtube_getvideo(url, res):
 ########################################################################################################################################## tiktok
 
 ########################################################################################################################################## link 2 file4
-
 from urllib.parse import urlparse
-
 
 def downloader(url):
   response = get(url, allow_redirects=True)
 
   if response.status_code == 200:
     content_disposition = response.headers.get("content-disposition")
+    
     if content_disposition:
       filename = content_disposition.split("filename=")[1].strip('"')
     else:
@@ -219,24 +155,21 @@ def downloader(url):
 
     with open(f"{home}cache/other/{filename}", "wb") as file:
       file.write(response.content)
-
     return filename
+  
   else:
     print(f"Failed to download file: {response.status_code}")
     return None
-
-
-
 
 def get_file_size(url):
   response = head(url, allow_redirects=True)
 
   if response.status_code == 200:
-
     content_length = response.headers.get("content-length")
     if content_length:
       return int(content_length) / (1024 * 1024)
     else:
       return None
+    
   else:
     return None

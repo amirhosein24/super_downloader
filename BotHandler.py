@@ -32,7 +32,7 @@ def thread_start(update, context):
             if not methods.channel_checker(context, chat_id):
                 update.message.reply_text('لطفا برای استفاده از ربات در کانال ما جوین شوید. :)', reply_markup=keyboards.ForceJoinKeyboard, reply_to_message_id=update.message.message_id)
                 return
-            update.message.reply_text(f"سلام {firstname}, به ربات دانلودر توییتر خوش آومدی \nلینک توییتت رو بفرست اینجا تا برات فیلم هاشو بفرستم")
+            update.message.reply_text(f"سلام {firstname}, به ربات دانلودر خوش آومدین\n لینک فایل یا پست شبکه اجتماعی مد نظرت رو بفرست تا برات دانلودش کنم ╰(*°▽°*)╯")
         except Exception as error:
             context.bot.send_message(chat_id=creds.Admin, text=f"Error in thread_start by {chat_id}\nerror : \n{error}")
 
@@ -98,13 +98,13 @@ def thread_link_manager(update, context):
         # instagram section
         elif link.startswith("https://www.instagram.com") or link.startswith("https://instagram.com"):      
 
-            context.bot.send_message(chat_id=chat_id, text="در حال حاضر دانلود اینستاگرام غیر فعال میباشد.", reply_to_message_id=update.message.message_id)
+            # context.bot.send_message(chat_id=chat_id, text="در حال حاضر دانلود اینستاگرام غیر فعال میباشد.", reply_to_message_id=update.message.message_id)
 
-            # wait_message = context.bot.send_message(chat_id=chat_id, text="در حال پردازش ...", reply_to_message_id=update.message.message_id)
-            # file_list, caption = methods.download_insta(chat_id, link)
-            # run_filesender(file_sender(chat_id, file_list, caption))
-            # context.bot.send_message(chat_id=chat_id, text="""（づ￣3￣）づ╭❤️～""", reply_markup=keyboards.SponsorKeyboard)
-            # context.bot.delete_message(chat_id=chat_id, message_id=wait_message.message_id)
+            wait_message = context.bot.send_message(chat_id=chat_id, text="در حال پردازش ...", reply_to_message_id=update.message.message_id)
+            file_list, caption = methods.download_insta(chat_id, link)
+            run_filesender(file_sender(chat_id, file_list, caption))
+            context.bot.send_message(chat_id=chat_id, text="""（づ￣3￣）づ╭❤️～""", reply_markup=keyboards.SponsorKeyboard)
+            context.bot.delete_message(chat_id=chat_id, message_id=wait_message.message_id)
 
 
         else:
