@@ -94,45 +94,45 @@ def youtube_getvideo(url, res):
 
 ########################################################################################################################################## insta
 
-# from instagrapi import Client
+from instagrapi import Client
 
-# client = Client()
-# client.login(Instagram[0], Instagram[1])
+client = Client()
+client.login("garshaspx", "hasanALI2411")
 
-# def download_insta(chat_id, url):
-#     media_info = client.media_info(client.media_pk_from_url(url))
-#     caption = media_info.caption_text
-#     file_list  = []
+def download_insta(chat_id, url):
+    media_info = client.media_info(client.media_pk_from_url(url))
+    caption = media_info.caption_text
+    file_list  = []
 
-#     if media_info.resources:
-#         for index, item in enumerate(media_info.resources):
+    if media_info.resources:
+        for index, item in enumerate(media_info.resources):
             
-#             if item.video_url :
-#                 download_url = item.video_url
-#                 filename = f"{chat_id}-{index}.mp4"
-#             else:
-#                 download_url = item.thumbnail_url
-#                 filename = f"{chat_id}-{index}.jpg"
+            if item.video_url :
+                download_url = item.video_url
+                filename = f"{chat_id}-{index}.mp4"
+            else:
+                download_url = item.thumbnail_url
+                filename = f"{chat_id}-{index}.jpg"
 
-#             file_list.append(home + "cache/insta/" + filename)
-#             response = get(download_url)
-#             with open(home + "cache/insta/" + filename, 'wb') as file:
-#                 file.write(response.content)
-#     else:
+            file_list.append(home + "cache/insta/" + filename)
+            response = get(download_url)
+            with open(home + "cache/insta/" + filename, 'wb') as file:
+                file.write(response.content)
+    else:
         
-#         if media_info.video_url :
-#             download_url = media_info.video_url
-#             filename = f"{chat_id}.mp4"
-#         else:
-#             download_url = media_info.thumbnail_url
-#             filename = f"{chat_id}.jpg"
+        if media_info.video_url :
+            download_url = media_info.video_url
+            filename = f"{chat_id}.mp4"
+        else:
+            download_url = media_info.thumbnail_url
+            filename = f"{chat_id}.jpg"
 
-#         file_list.append(home + "cache/insta/" + filename)
-#         response = get(download_url)
-#         with open(home + "cache/insta/" + filename, 'wb') as file:
-#             file.write(response.content)
+        file_list.append(home + "cache/insta/" + filename)
+        response = get(download_url)
+        with open(home + "cache/insta/" + filename, 'wb') as file:
+            file.write(response.content)
 
-#     return file_list, caption
+    return file_list, caption
 
 
 

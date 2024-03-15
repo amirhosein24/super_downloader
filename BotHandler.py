@@ -62,7 +62,8 @@ def thread_link_manager(update, context):
         if link == "❌ لغو خرید ❌":
             update.message.reply_text(f"سلام {update.message.chat.first_name}, به ربات دانلودر توییتر خوش آومدی \nلینک توییتت رو بفرست اینجا تا برات فیلم هاشو بفرستم",
                                        reply_markup=keyboards.RemoveKeys)
-
+            return
+        
         # twitter section
         elif (link.startswith("https://x.com") or link.startswith("https://twitter.com")):      
 
@@ -171,7 +172,7 @@ async def file_sender(chat_id, file_path, caption=None):
             else:
                 if path.exists(file_path):
                     remove(file_path)
-
+ 
 
 def run_filesender(coro):
     loop = new_event_loop()
