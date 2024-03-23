@@ -55,13 +55,14 @@ def thread_link_manager(update, context):
         chat_id = update.message.chat_id
         link    = update.message.text
 
-        if not methods.channel_checker(context, chat_id):
-            update.message.reply_text('لطفا برای استفاده از ربات در کانال ما جوین شوید. :)', reply_markup=keyboards.ForceJoinKeyboard, reply_to_message_id=update.message.message_id)
-            return
 
         if link == "❌ لغو خرید ❌":
             update.message.reply_text(f"سلام {update.message.chat.first_name}, به ربات دانلودر توییتر خوش آومدی \nلینک توییتت رو بفرست اینجا تا برات فیلم هاشو بفرستم",
                                        reply_markup=keyboards.RemoveKeys)
+            return
+        
+        if not methods.channel_checker(context, chat_id):
+            update.message.reply_text('لطفا برای استفاده از ربات در کانال ما جوین شوید. :)', reply_markup=keyboards.ForceJoinKeyboard, reply_to_message_id=update.message.message_id)
             return
         
         # twitter section
@@ -131,9 +132,7 @@ def thread_link_manager(update, context):
         
         context.bot.send_message(chat_id=chat_id, text="ی مشکلی پیش اومد ببشید, دوباره بفرست برام شاید تونستم")
         context.bot.send_message(chat_id=creds.Admin, text=f"error in link_manager by {chat_id}\nerror:\n{error}")
-        print(error)
-
-
+        
     finally:
         pass 
         # try: TODO
@@ -190,7 +189,6 @@ def thread_callback(update, context):
             if command == 'joined':
                 if methods.channel_checker(context, chat_id):
                     query.edit_message_text("ربات فعال شد الان میتونی استفاده کنی ")
-                    thread_link_manager(query, context)
 
                 else:
                     if chat_id == creds.Admin :
