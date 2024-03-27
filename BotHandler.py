@@ -68,11 +68,15 @@ def thread_link_manager(update, context):
         # twitter section
         elif (link.startswith("https://x.com") or link.startswith("https://twitter.com")):      
 
+            wait_message = context.bot.send_message(chat_id=chat_id, text="در حال پردازش ...", reply_to_message_id=update.message.message_id)
+
             url, caption = methods.create_url(context, link)
             if not url:
-                update.message.reply_text("داخل این لینک هیچ فیلمی پیدا نکردم") 
+                context.bot.edit_message_text(chat_id=chat_id, message_id=wait_message.message_id, text="داخل این لینک هیچ فیلمی پیدا نکردم")
                 return
-            wait_message = context.bot.send_message(chat_id=chat_id, text="داره دانلود میشه صبر کن یکم ...", reply_to_message_id=update.message.message_id)
+            
+            context.bot.edit_message_text(chat_id=chat_id, message_id=wait_message.message_id, text="داره دانلود میشه صبر کن یکم ...")
+
             file_names = [f"{home}cache/twitter/{chat_id}_{item}.mp4" for item in range(len(url))]
             i = 0
             for item in url:
@@ -190,12 +194,14 @@ def thread_callback(update, context):
                 if methods.channel_checker(context, chat_id):
                     query.edit_message_text("ربات فعال شد الان میتونی استفاده کنی ")
 
+                    if not (query.message.reply_to_message.text).startswith("/start"): 
+                        thread_link_manager(query, context)
                 else:
                     if chat_id == creds.Admin :
                         query.answer("اوففف ادمینن")        
                         query.message.reply_text('choose command :', reply_markup=keyboards.AdminKeyboard)
                     else:
-                        query.answer("جوین نشدی که :(")        
+                        query.answer("جوین نشدی که :(") 
 
             elif command.split("-")[0] == "youtube" :   # youtube manager
 

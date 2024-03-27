@@ -4,3 +4,5 @@ bs4
 requests
 pytube
 instagrapi
+Pillow>=8.1.1
+telethon
