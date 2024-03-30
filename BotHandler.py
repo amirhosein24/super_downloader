@@ -9,6 +9,7 @@ from os import remove, path, listdir, rename
 from asyncio import new_event_loop, set_event_loop
 from threading import Thread, enumerate
 
+from telethon.tl.types import DocumentAttributeVideo
 from telethon import TelegramClient
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 
@@ -155,13 +156,22 @@ def thread_link_manager(update, context):
 async def file_sender(chat_id, file_path, caption=None):
     async with TelegramClient(home + "telethon", creds.ApiId, creds.ApiHash) as client:
 
+    
+
+
+
         if caption:
             caption = f"{caption}\n\n<a href='https://t.me/x_downloadbot'>Downloader Bot | ربات دانلودر </a>"
         else:
             caption = "<a href='https://t.me/x_downloadbot'>Downloader Bot | ربات دانلودر </a>"
 
+
+        attributes = [DocumentAttributeVideo(duration=3, w=1280, h=720, supports_streaming=True)]
+
+
+
         try:
-            await client.send_message(chat_id, message=caption, parse_mode='html', link_preview=False, file=file_path)
+            await client.send_message(chat_id, message=caption, parse_mode='html', link_preview=False, file=file_path, attributes=attributes)
         except Exception as error:
             await client.send_message(chat_id, "ی مشکلی پیش اومد ببشید, دوباره بفرست برام شاید تونستم")
             await client.send_message(creds.Admin, f"error in file_sender by {chat_id}\nerror:\n{error}")
