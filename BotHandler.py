@@ -1,3 +1,4 @@
+
 import creds
 import methods
 import keyboards
@@ -43,11 +44,11 @@ def thread_help(update, context):
             update.message.reply_text('لطفا برای استفاده از ربات در کانال ما جوین شوید. :)', reply_markup=keyboards.ForceJoinKeyboard, reply_to_message_id=update.message.message_id)
             return
 
-def thread_premium(update, context):
-        update.message.reply_text("با خرید اشتراک شما میتوانید هر فایلی با هر حجمی رو دانلود کنید", reply_markup=keyboards.buymenu)
-        update.message.reply_text(
-            "لطفا بعد از خرید از صفحه انجام تراکنش یا پیام برداشت از حساب عکس گرفته و برای ربات بفرستید تا حساب شما شارژ شود.",
-            reply_markup=keyboards.cancelbuy)
+# def thread_premium(update, context):
+#         update.message.reply_text("با خرید اشتراک شما میتوانید هر فایلی با هر حجمی رو دانلود کنید", reply_markup=keyboards.buymenu)
+#         update.message.reply_text(
+#             "لطفا بعد از خرید از صفحه انجام تراکنش یا پیام برداشت از حساب عکس گرفته و برای ربات بفرستید تا حساب شما شارژ شود.",
+#             reply_markup=keyboards.cancelbuy)
 
 
 def thread_link_manager(update, context):
@@ -57,10 +58,10 @@ def thread_link_manager(update, context):
         link    = update.message.text
 
 
-        if link == "❌ لغو خرید ❌":
-            update.message.reply_text(f"سلام {update.message.chat.first_name}, به ربات دانلودر توییتر خوش آومدی \nلینک توییتت رو بفرست اینجا تا برات فیلم هاشو بفرستم",
-                                       reply_markup=keyboards.RemoveKeys)
-            return
+        # if link == "❌ لغو خرید ❌":
+        #     update.message.reply_text(f"سلام {update.message.chat.first_name}, به ربات دانلودر توییتر خوش آومدی \nلینک توییتت رو بفرست اینجا تا برات فیلم هاشو بفرستم",
+        #                                reply_markup=keyboards.RemoveKeys)
+        #     return
         
         if not methods.channel_checker(context, chat_id):
             update.message.reply_text('لطفا برای استفاده از ربات در کانال ما جوین شوید. :)', reply_markup=keyboards.ForceJoinKeyboard, reply_to_message_id=update.message.message_id)
@@ -68,16 +69,12 @@ def thread_link_manager(update, context):
         
         # twitter section
         elif (link.startswith("https://x.com") or link.startswith("https://twitter.com")):      
-
             wait_message = context.bot.send_message(chat_id=chat_id, text="در حال پردازش ...", reply_to_message_id=update.message.message_id)
-
             url, caption = methods.create_url(context, link)
             if not url:
                 context.bot.edit_message_text(chat_id=chat_id, message_id=wait_message.message_id, text="داخل این لینک هیچ فیلمی پیدا نکردم")
                 return
-            
             context.bot.edit_message_text(chat_id=chat_id, message_id=wait_message.message_id, text="داره دانلود میشه صبر کن یکم ...")
-
             file_names = [f"{home}cache/twitter/{chat_id}_{item}.mp4" for item in range(len(url))]
             i = 0
             for item in url:
@@ -104,7 +101,6 @@ def thread_link_manager(update, context):
 
         # instagram section
         elif link.startswith("https://www.instagram.com") or link.startswith("https://instagram.com"):      
-
             context.bot.send_message(chat_id=chat_id, text="در حال حاضر دانلود اینستاگرام غیر فعال میباشد.", reply_to_message_id=update.message.message_id)
             return
 
@@ -114,17 +110,16 @@ def thread_link_manager(update, context):
             context.bot.send_message(chat_id=chat_id, text="""（づ￣3￣）づ╭❤️～""", reply_markup=keyboards.SponsorKeyboard)
             context.bot.delete_message(chat_id=chat_id, message_id=wait_message.message_id)
 
-
-        else:
-            
+        # direct download from internet
+        else:   
             try:
                 file_size = methods.get_file_size(link)
             except:
                 context.bot.send_message(chat_id=chat_id, text="لینک درست شناسایی نشد, از صحت لینک دانلود فایل مطمن شوید")
                 return
 
-            if file_size > 100 and not db.is_prem(chat_id):
-                context.bot.send_message(chat_id=chat_id, text="برای دانلود فایل ها با حجم بالاتر از ۱۰۰ مگابایت به اشتراک پریمیوم نیاز دارید\n از دستور /premium استفاده کنید")
+            if file_size > 1024:
+                context.bot.send_message(chat_id=chat_id, text='در حال حاضر دانلود فایل های بیشتر از یک گیگابایت ممکن نمی باشد.')
                 return
                 
             wait_message = context.bot.send_message(chat_id=chat_id, text="در حال دانلود ...", reply_to_message_id=update.message.message_id)
@@ -135,9 +130,8 @@ def thread_link_manager(update, context):
             context.bot.deleteMessage(chat_id=chat_id, message_id=wait_message.message_id)
 
     except Exception as error:
-        
         context.bot.send_message(chat_id=chat_id, text="ی مشکلی پیش اومد ببشید, دوباره بفرست برام شاید تونستم")
-        context.bot.send_message(chat_id=creds.Admin, text=f"error in link_manager by {chat_id}\nerror:\n{error}")
+        context.bot.send_message(chat_id=creds.Admin, text=f"error in link_manager by:{chat_id}\n==============\nerror:\n{error}\n==============\nlink:\n{link}")
         
     finally:
         pass 
@@ -157,19 +151,12 @@ def thread_link_manager(update, context):
 async def file_sender(chat_id, file_path, caption=None):
     async with TelegramClient(home + "telethon", creds.ApiId, creds.ApiHash) as client:
 
-    
-
-
-
         if caption:
             caption = f"{caption}\n\n<a href='https://t.me/x_downloadbot'>Downloader Bot | ربات دانلودر </a>"
         else:
             caption = "<a href='https://t.me/x_downloadbot'>Downloader Bot | ربات دانلودر </a>"
 
-
         attributes = [DocumentAttributeVideo(duration=3, w=1280, h=720, supports_streaming=True)]
-
-
 
         try:
             await client.send_message(chat_id, message=caption, parse_mode='html', link_preview=False, file=file_path, attributes=attributes)
@@ -217,9 +204,8 @@ def thread_callback(update, context):
             elif command.split("-")[0] == "youtube" :   # youtube manager
 
                 generator = methods.youtube_getvideo(query.message.reply_to_message.text, command.split("-")[1])
-
-                if next(generator) > 100 and not db.is_prem(chat_id):
-                    context.bot.send_message(chat_id=chat_id, text="برای دانلود فایل ها با حجم بالاتر از ۱۰۰ مگابایت به اشتراک پریمیوم نیاز دارید\n از دستور /premium استفاده کنید")
+                if next(generator) > 1024:
+                    context.bot.send_message(chat_id=chat_id, text='در حال حاضر دانلود فایل های بیشتر از یک گیگابایت ممکن نمی باشد.')
                     return
 
                 query.edit_message_text("دانلود شروع شد ...")
@@ -264,21 +250,21 @@ def thread_callback(update, context):
            
 
 
-def thread_forward(update, context):
+# def thread_forward(update, context):
 
-    chat_id = update.message.chat_id
+#     chat_id = update.message.chat_id
 
-    try:
-        photo_id = update.message.photo[-1].file_id
-        pic = context.bot.send_photo(chat_id=creds.Admin, photo=photo_id, caption=chat_id, reply_markup=keyboards.admin_addmenu)
-        if update.message.caption:
-            context.bot.send_message(chat_id=creds.Admin, text=update.message.caption, reply_to_message_id=pic.message_id)
-        update.message.reply_text("در حال برسی, چند دقیقه صبر کنید ...", reply_to_message_id=update.message.message_id, reply_markup=keyboards.RemoveKeys)
-        return
+#     try:
+#         photo_id = update.message.photo[-1].file_id
+#         pic = context.bot.send_photo(chat_id=creds.Admin, photo=photo_id, caption=chat_id, reply_markup=keyboards.admin_addmenu)
+#         if update.message.caption:
+#             context.bot.send_message(chat_id=creds.Admin, text=update.message.caption, reply_to_message_id=pic.message_id)
+#         update.message.reply_text("در حال برسی, چند دقیقه صبر کنید ...", reply_to_message_id=update.message.message_id, reply_markup=keyboards.RemoveKeys)
+#         return
 
-    except Exception as error:
-        update.message.reply_text("مشکلی در سیستم پیش آمد, لطفا دوباره تلاش کنید.")
-        context.bot.send_message(chat_id=creds.Admin, text=f"error in thread forward by {update.message.caption}\nerror : {error}")
+#     except Exception as error:
+#         update.message.reply_text("مشکلی در سیستم پیش آمد, لطفا دوباره تلاش کنید.")
+#         context.bot.send_message(chat_id=creds.Admin, text=f"error in thread forward by {update.message.caption}\nerror : {error}")
 
 
 ###########################################################################################################################################################
@@ -299,11 +285,11 @@ def help(update, context):
 def callback(update, context):
     Thread(target=thread_callback, args=(update, context, )).start()
 
-def premium(update, context):
-    Thread(target=thread_premium, args=(update, context, )).start()
+# def premium(update, context):
+#     Thread(target=thread_premium, args=(update, context, )).start()
 
-def forward_photo(update, context):
-    Thread(target=thread_forward, args=(update, context,)).start()
+# def forward_photo(update, context):
+#     Thread(target=thread_forward, args=(update, context,)).start()
 
 def go_live():
     print("going live...")
@@ -313,9 +299,9 @@ def go_live():
             updater.dispatcher.add_handler(CommandHandler('start', start))
             updater.dispatcher.add_handler(CommandHandler('restart', start))
             updater.dispatcher.add_handler(CommandHandler('help', help))
-            updater.dispatcher.add_handler(CommandHandler('premium', premium))
+            # updater.dispatcher.add_handler(CommandHandler('premium', premium))
             updater.dispatcher.add_handler(CallbackQueryHandler(callback))
-            updater.dispatcher.add_handler(MessageHandler(Filters.photo, forward_photo))
+            # updater.dispatcher.add_handler(MessageHandler(Filters.photo, forward_photo))
             updater.dispatcher.add_handler(MessageHandler(Filters.text, link_manager))
             updater.start_polling()     
             print("bot is live.")
@@ -326,3 +312,5 @@ def go_live():
 
 if __name__ == "__main__":
     go_live()
+
+
