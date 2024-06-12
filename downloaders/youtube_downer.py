@@ -1,37 +1,44 @@
+
+from credentials.creds import Home
+
 from pytube import YouTube
 from datetime import timedelta
 
 
-def youtube_getinfo(url):
-    try:
-        yt = YouTube(url)
+def download(url, itag):
 
-        data = {}
+    yt = YouTube(url)
+
+    for stream in yt.streams:
+
+        if stream.itag == itag:
+            file = stream.download(output_path=Home + "downloaders/cache/")
+            return file
+
+    return False
+
+
+def getinfo(link):
+
+    yt = YouTube(link)
+    data = {}
+
+    for stream in yt.streams:
+
+        if stream.mime_type.startswith("video") and not stream.is_progressive:
+            if not stream.resolution in data:
+                data[stream.resolution] = {"itag": stream.itag,
+                                           "size": round(stream.filesize / (1024 * 1024), 1)}
+
+            elif stream.mime_type.split("/")[1] == "mp4":
+                data[stream.resolution] = {"itag": stream.itag,
+                                           "size": round(stream.filesize / (1024 * 1024), 1)}
+
+        elif stream.mime_type == "audio/mp4":
+            data[stream.abr] = {"itag": stream.itag,
+                                "size": round(stream.filesize / (1024 * 1024), 1)}
+
         data["title"], data["length"] = yt.title, str(
             timedelta(seconds=yt.length))  # in seconds
-        video = yt.streams.filter(progressive=True)
 
-        for stream in video:
-            resolution = str(stream.resolution)
-            file_size = str(round(stream.filesize / (1024 * 1024), 2))
-            if resolution not in data or file_size < data[resolution]:
-                data[resolution] = file_size
-        return data, True
-
-    except Exception as error:
-        return str(error), False
-
-
-def youtube_getvideo(url, res):
-    try:
-        yt = YouTube(url)
-
-        stream = yt.streams.filter(res=res, progressive=True).first()
-        yield int(stream.filesize / (1024 * 1024))
-
-        file = stream.download(output_path=home + "cache/youtube/")
-        yield file, yt.title
-
-    except Exception as e:
-        print(f"Error downloading video: {e}")
-        yield False, False
+    return data

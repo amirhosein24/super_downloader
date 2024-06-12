@@ -20,7 +20,7 @@ def spot_download(link, bitrate="320k"):
 
     command = f"spotdl --bitrate {bitrate} {link}"
 
-    command = f"spotdl --bitrate {bitrate} --output-dir {output_dir} --output {output_format} {link}"
+    command = f"spotdl --bitrate {bitrate} --output-dir {Home}dwonloaders/cache/ {link}"
 
     subprocess.run(command, check=True, shell=True)
 

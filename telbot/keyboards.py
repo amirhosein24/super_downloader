@@ -1,7 +1,7 @@
 
 
 
-from downloader_bot.credentials.creds import ForceJoin, Sponsor
+from credentials.creds import ForceJoin, Sponsor
 from telethon import Button
 
 ForceJoinKeyboard = [Button.url(item, ForceJoin[item]) for item in ForceJoin.keys()]

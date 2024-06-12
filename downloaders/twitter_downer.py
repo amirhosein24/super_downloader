@@ -1,12 +1,14 @@
 from bs4 import BeautifulSoup
 from requests import get
-from credentials.creds import Admin
+from credentials.creds import Admin, Home
 
 
 def download_video(url, name) -> None:
     response = get(url)
-    with open(name, "wb") as file:
-        file.write(response.content)
+
+    with open(f"{Home}downloaders/cache/{name}", "wb") as file:
+        for chunk in response.iter_content(chunk_size=8192):
+            file.write(chunk)
 
 
 def create_url(context, url):

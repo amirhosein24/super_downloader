@@ -22,13 +22,14 @@ def load_json():
     forcejoin_name = config["ForceJoin"]
     forcejoin_id = config["ForceJoinId"]
     sponsor = config["Sponsor"]
+    apps = config["apps"]
 
     from telegram import Bot
     bot = Bot(token=botToken)
 
     del config, load, path, _exit, Bot
 
-    return admin, home, botToken, api_id, api_hash, forcejoin_id, forcejoin_name, sponsor, bot
+    return admin, home, botToken, api_id, api_hash, forcejoin_id, forcejoin_name, sponsor, bot, apps
 
 
-Admin, Home, BotToken, ApiId, ApiHash, ForceJoindId, ForceJoindName, Sponser, Bot = load_json()
+Admin, Home, BotToken, ApiId, ApiHash, ForceJoindId, ForceJoindName, Sponser, Bot, Apps = load_json()
