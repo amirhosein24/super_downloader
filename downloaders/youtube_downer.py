@@ -42,5 +42,3 @@ def getinfo(link):
             timedelta(seconds=yt.length))  # in seconds
 
     return data
-
-

@@ -4,7 +4,6 @@ from credentials.creds import Channel, Sponsor
 from telethon import Button
 
 
-
 ForceJoinKeyboard = [
     Button.url(item, Channel[item]) for item in Channel
 ]
