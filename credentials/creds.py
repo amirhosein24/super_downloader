@@ -19,8 +19,8 @@ def load_json():
     api_id = config["ApiId"]
     api_hash = config["ApiHash"]
 
-    forcejoin_name = config["ForceJoin"]
-    forcejoin_id = config["ForceJoinId"]
+    channel = config["Channel"]
+
     sponsor = config["Sponsor"]
     apps = config["apps"]
 
@@ -29,7 +29,7 @@ def load_json():
 
     del config, load, path, _exit, Bot
 
-    return admin, home, botToken, api_id, api_hash, forcejoin_id, forcejoin_name, sponsor, bot, apps
+    return admin, home, botToken, api_id, api_hash, channel, sponsor, bot, apps
 
 
-Admin, Home, BotToken, ApiId, ApiHash, ForceJoindId, ForceJoindName, Sponser, Bot, Apps = load_json()
+Admin, Home, BotToken, ApiId, ApiHash, Channel, Sponsor, Bot, Apps = load_json()

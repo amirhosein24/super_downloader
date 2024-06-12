@@ -1,3 +1,11 @@
 
+from telbot.BotHandler import go_live
 
-from credentials import creds
+
+if __name__ == "__main__":
+    while True:
+
+        try:
+            go_live()
+        except Exception as error:
+            print(f"error in main if, error: {error}")

@@ -1,23 +1,21 @@
 
 
-from telbot import keyboards, methods
 
 import credentials.creds as creds
 import database.DataBase as db
 
-from time import sleep
+import asyncio
 from os import remove, path, listdir, rename
 
-# from asyncio import new_event_loop, set_event_loop0
-from threading import Thread, enumerate
+from telbot import keyboards, sender, channel
 
-# from telethon.tl.types import DocumentAttributeVideo
 from telethon import TelegramClient, events
 
 
 home = path.dirname(path.realpath(__file__)) + "/"
 
-client = TelegramClient(home+"all_downer", api_id="", api_hash="")
+client = TelegramClient(
+    home+"all_downer", api_id=creds.ApiId, api_hash=creds.ApiHash)
 
 
 @client.on(events.NewMessage(pattern='/start'))
@@ -30,9 +28,9 @@ async def start(event):
         lastname = user.last_name
 
         if db.add_user(int(chat_id), username, firstname, lastname):
-            await client.send_message(admin_chat_id, f"bot started by:\nchat_id: {chat_id}\nname: {firstname}-{lastname}\nusername: @{username}")
+            await client.send_message(creds.Admin, f"bot started by: `{chat_id}`\nname: {firstname}-{lastname}\nusername: @{username}")
 
-        if not methods.channel_checker(client, chat_id):
+        if not channel.channel_checker(client, chat_id):
             await event.reply('لطفا برای استفاده از ربات در کانال ما جوین شوید. :)')
             return
 
@@ -228,6 +226,10 @@ async def thread_forward(event):
     chat_id = event.chat_id
 
     try:
+
+
+
+
         if event.photo:
             photo_id = event.photo.id
             pic = await client.send_file(creds.Admin, event.photo, caption=chat_id, reply_markup=keyboards.admin_addmenu)
@@ -240,17 +242,8 @@ async def thread_forward(event):
         await event.respond("مشکلی در سیستم پیش آمد, لطفا دوباره تلاش کنید.")
         await client.send_message(creds.Admin, f"error in thread forward by {event.message.message}\nerror : {error}")
 
-###########################################################################################################################################################
-###########################################################################################################################################################
-
 
 def go_live():
-    while True:
-        try:
-            client.start(bot_token="")
-            print("going live...")
-
-            client.run_until_disconnected
-        except Exception as error:
-            print(f"Retrying in 10 sec... Error: {error}")
-            sleep(10)
+    client.start(bot_token=creds.BotToken)
+    print("going live... ,returns error if unsuccesfull")
+    client.run_until_disconnected()
