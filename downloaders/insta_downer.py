@@ -1,3 +1,4 @@
+
 import requests
 import instaloader
 from credentials.creds import Home, Bot, Admin
@@ -35,18 +36,24 @@ def instagram(chat_id, link):
                     video_url = node.video_url
                     download_slide(video_url, f"{chat_id}_{shortcode}_{_}")
 
-                else:
+                elif node.display_url:
                     photo_url = node.display_url
                     download_slide(photo_url, f"{chat_id}_{shortcode}_{_}")
+
+                else:
+                    return None
 
         else:
             if post.is_video:  # Single video post
                 video_url = post.video_url
                 download_slide(video_url, f"{chat_id}_{shortcode}")
 
-            else:    # Single image post
+            elif post.url:    # Single image post
                 media_url = post.url
                 download_slide(media_url, f"{chat_id}_{shortcode}")
+
+            else:
+                return None
 
         return True
 

@@ -1,5 +1,5 @@
 
-from telbot.BotHandler import go_live
+from telbot.bothandler import go_live
 
 
 if __name__ == "__main__":

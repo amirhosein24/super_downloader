@@ -14,7 +14,7 @@ def load_json():
         _exit(0)
 
     admin = config["Admin"]
-    botToken = config["BotToken"]
+    bottoken = config["BotToken"]
 
     api_id = config["ApiId"]
     api_hash = config["ApiHash"]
@@ -25,11 +25,11 @@ def load_json():
     apps = config["apps"]
 
     from telegram import Bot
-    bot = Bot(token=botToken)
+    bot = Bot(token=bottoken)
 
     del config, load, path, _exit, Bot
 
-    return admin, home, botToken, api_id, api_hash, channel, sponsor, bot, apps
+    return admin, home, bottoken, api_id, api_hash, channel, sponsor, bot, apps
 
 
 Admin, Home, BotToken, ApiId, ApiHash, Channel, Sponsor, Bot, Apps = load_json()

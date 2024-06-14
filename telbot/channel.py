@@ -4,8 +4,6 @@ from credentials.creds import Channel, Bot, Admin
 from telethon.tl.functions.channels import GetParticipantRequest
 from telethon.errors import UserNotParticipantError
 
-from traceback import format_exc
-
 
 async def is_member(client, user_id):
 
@@ -17,8 +15,10 @@ async def is_member(client, user_id):
         except UserNotParticipantError:
             return False
 
-        except:
-            Bot.send_message(chat_id=Admin, text=format_exc())
+        except Exception as error:
+            from traceback import extract_tb
+            tb = extract_tb(error.__traceback__)
+            Bot.send_message(chat_id=Admin, text=f"Error occurred in channel.is_member, line:{tb[-1].lineno}\nerror:\n\n{error}")
             return True
 
     return True

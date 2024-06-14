@@ -1,4 +1,3 @@
-
 from time import sleep
 from threading import Thread
 from datetime import datetime, date
@@ -15,8 +14,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine, Column, Integer, String, DateTime
 
-engine = create_engine(f"sqlite:///{Home}database/db.sqlite", poolclass=QueuePool,
-                       pool_recycle=1800, connect_args={'check_same_thread': False})
+engine = create_engine(f"sqlite:///{Home}database/db.sqlite", poolclass=QueuePool, pool_recycle=1800,
+                       connect_args={'check_same_thread': False})
 
 Base = declarative_base()
 
@@ -24,7 +23,6 @@ Base = declarative_base()
 class UserData(Base):
     __tablename__ = 'user_data'
 
-    id = Column(Integer, autoincrement=True)
     chat_id = Column(Integer, primary_key=True)
     username = Column(String)
     firstname = Column(String)
@@ -57,15 +55,13 @@ def handle_prem_till(chat_id, add: bool = False):
 
                 user_data.prem_till = prem_till
                 session.commit()
-                iranian_date = jdatetime.fromgregorian(
-                    day=prem_till.day, month=prem_till.month, year=prem_till.year)
+                iranian_date = jdatetime.fromgregorian(day=prem_till.day, month=prem_till.month, year=prem_till.year)
 
                 return iranian_date.strftime("%Y/%m/%d")
 
             prem_till = user_data.prem_till
             if prem_till:
-                iranian_date = jdatetime.fromgregorian(
-                    day=prem_till.day, month=prem_till.month, year=prem_till.year)
+                iranian_date = jdatetime.fromgregorian(day=prem_till.day, month=prem_till.month, year=prem_till.year)
 
                 return iranian_date.strftime("%Y/%m/%d")
             else:
@@ -82,11 +78,7 @@ def handle_prem_till(chat_id, add: bool = False):
 def add_user(chat_id, username, firstname, lastname):
     session = sessionmaker(bind=engine)()
     try:
-        new_user = UserData(
-            chat_id=chat_id,
-            username=username,
-            firstname=firstname,
-            lastname=lastname,
+        new_user = UserData(chat_id=chat_id, username=username, firstname=firstname, lastname=lastname,
             timejoined=datetime.now())
         session.add(new_user)
         session.commit()
@@ -97,14 +89,31 @@ def add_user(chat_id, username, firstname, lastname):
         session.close()
         return False
 
+
 ######################################################################################################################
 
 
-def AddUsageNum(chat_id):
+def add_usage_num(chat_id):
     session = sessionmaker(bind=engine)()
     user_data = session.query(UserData).filter_by(chat_id=chat_id).first()
     if user_data:
-        user_data.usageNum += 1
+        user_data.usagenum += 1
+        session.commit()
+        session.close()
+        return True
+    else:
+        session.close()
+        return False
+
+
+######################################################################################################################
+
+def add_usage_size(chat_id, amount: int):
+    session = sessionmaker(bind=engine)()
+
+    user_data = session.query(UserData).filter_by(chat_id=chat_id).first()
+    if user_data:
+        user_data.usagesize += amount
         session.commit()
         session.close()
         return True
@@ -134,7 +143,6 @@ def check_prem_till():
         now = datetime.now()
         next_time = now.replace(hour=23, minute=59, second=59)
         delta = next_time - now
-
         sleep(abs(delta.total_seconds()))
 
 

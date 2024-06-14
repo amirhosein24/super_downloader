@@ -1,4 +1,4 @@
-creds.json
+credentials/creds.json
 __pycache__/
 cache/
 test/

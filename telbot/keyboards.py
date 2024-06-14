@@ -4,20 +4,31 @@ from credentials.creds import Channel, Sponsor
 from telethon import Button
 
 
-ForceJoinKeyboard = [
-    Button.url(item, Channel[item]) for item in Channel
-]
+def join_channel_key():
 
-ForceJoinKeyboard.append(Button.inline("جوین شدم :)", data="joined"))
+    buttons = list()
+    for channel_name in Channel:
+        buttons.append(
+            [
+                Button.url(channel_name, Channel[channel_name]["link"])
+            ]
+        )
+    buttons.append(
+        [
+            Button.inline("جوین شدم :)))", data='joined')
+        ]
+    )
+    return buttons
+
 
 SponsorKeyboard = [Button.url(item, Sponsor[item]) for item in Sponsor.keys()]
 
 
-def CreateKey(link, data):
+def create_keys(link, data):
     keyboard = []
 
     for res in data.keys():
-        if not res in ["title", "length"]:
+        if res not in ["title", "length"]:
 
             size = data[res]["size"]
             tag = data[res]["itag"]
