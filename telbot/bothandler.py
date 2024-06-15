@@ -1,97 +1,95 @@
 
-
 import database.DataBase as db
-from telbot import keyboards, channel
-from credentials.creds import Admin, BotToken, ApiId, ApiHash, Home
+from telbot import keyboards, channel, downer
+from credentials.creds import Admin, BotToken
 
-from telethon import TelegramClient, events
-
-client = TelegramClient(Home+"all_downer", api_id=ApiId, api_hash=ApiHash)
-del ApiId, ApiHash, Home
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, CallbackQueryHandler
 
 
-@client.on(events.NewMessage(pattern='/start', func=lambda element: element.is_private))
-async def start_handler(event):
-    chat_id = event.sender.id
+def start_handler(update: Update, context: CallbackContext):
+    chat_id = update.effective_chat.id
 
     try:
         if db.add_user(
                 chat_id,
-                event.sender.first_name,
-                event.sender.last_name,
-                event.sender.username
+                update.effective_chat.first_name,
+                update.effective_chat.last_name,
+                update.effective_chat.username
         ):
-            log_text = f"chat_id: `{chat_id}`\nname: {event.sender.first_name}-{event.sender.last_name}\nusername: @{event.sender.username}"
-            await client.send_message(Admin, log_text)
+            log_text = f"chat_id: `{chat_id}`\nname: {update.effective_chat.first_name}-{update.effective_chat.last_name}\nusername: @{update.effective_chat.username}"
+            context.bot.send_message(chat_id=Admin, text=log_text)
 
-            # try:
-            #     if len(event.message.message) != len("/start"):
-            #         inviter = event.message.message[len("/start") + 1:]
-            #         invited_number = db.handle_invite(inviter, True)
-            #         if invited_number % 3 == 0:
-            #             db.handle_prem_time(inviter, 1800)
-            #             await client.send_message(int(inviter), creds.Text["user_text"]["invited"], buttons=keyboards.BackMainKey)
-            # except:
-            #     pass
-
-        if await channel.is_member(client, chat_id):
-            await event.respond(f"wellcome to our bot")
+        if channel.is_member(chat_id):
+            update.message.reply_text(f"wellcome to our bot")
         else:
-            await event.respond("hosde", buttons=keyboards.join_channel_key())
+            update.message.reply_text("hosde", reply_markup=keyboards.join_channel_key())
 
     except Exception as error:
-        from traceback import extract_tb
-        tb = extract_tb(error.__traceback__)
-        await client.send_message(Admin, f"Error occurred in bothandler.start_handler, line:{tb[-1].lineno}\nerror:\n\n{error}")
+        import traceback
+        tb = traceback.format_exc()
+        context.bot.send_message(chat_id=Admin, text=f"Error occurred in bothandler.start_handler, line:{tb.splitlines()[-1]}\nerror:\n\n{error}")
+        update.message.reply_text("مشکلی در سیستم پیش امد, لطفا چند لحظه دیگر دوباره تلاش کنید")
 
 
-@client.on(events.NewMessage(pattern='/help'))
-async def help_handler(event):
-    await event.reply("how to use the bot : \n\n ....")
-    if not await channel.is_member(client, event.chat_id):
-        await event.reply('لطفا برای استفاده از ربات در کانال ما جوین شوید. :)')
+def help_handler(update: Update, context: CallbackContext):
+    update.message.reply_text("how to use the bot : \n\n ....")
+    if not channel.is_member(update.effective_chat.id):
+        update.message.reply_text('لطفا برای استفاده از ربات در کانال ما جوین شوید. :)')
         return
 
-# @client.on(events.NewMessage(func=lambda element: element.is_private and not element.message.out))
-# async def my_event_handler(event):
-#     try:
-#         chat_id = event.chat_id
-#         link = event.raw_text
-#         if not channel.is_member(chat_id):
-#             await event.respond('لطفا برای استفاده از ربات در کانال ما جوین شوید. :)', buttons=keyboards.ForceJoinKeyboard)
-#             return
-#     except Exception as error:
-#         await event.respond('ی مشکلی پیش اومد ببشید, دوباره بفرست برام شاید تونستم')
-#         await client.send_message(creds.Admin, f'error in link_manager by:{chat_id}\n==============\nerror:\n{error}\n==============\nlink:\n{link}')
-#
-#     finally:
-#         pass
+
+def link_handler(update: Update, context: CallbackContext):
+    try:
+
+        chat_id = update.effective_chat.id
+        link = update.message.text
+
+        if not channel.is_member(chat_id):
+            update.message.reply_text('لطفا برای استفاده از ربات در کانال ما جوین شوید. :)')
+            return
+
+        downer.thread_handler(update, context)
+
+    except Exception as error:
+        update.message.reply_text('ی مشکلی پیش اومد ببشید, دوباره بفرست براddddddddddddddم شاید تونستم')
+        context.bot.send_message(chat_id=Admin, text=f'error in bothandler.link_handler by:`{chat_id}`\nlink:-----\n{link}\nerror:-----\n{error}')
 
 
-@client.on(events.CallbackQuery())
-async def callback_handler(event):
-
-    chat_id = event.sender.id
-    command = event.data.decode("utf-8")
-
+def callback_handler(update: Update, context: CallbackContext):
+    query = update.callback_query
+    chat_id = query.from_user.id
+    command = query.data
+    print(command)
     try:
         if command == 'joined':
-            if await channel.is_member(client, chat_id):
-                await event.edit('ربات فعال شد الان میتونی استفاده کنی')
+            if channel.is_member(chat_id):
+                query.edit_message_text('ربات فعال شد الان میتونی استفاده کنی')
             else:
-                await event.answer('جوین نشدی که :(')
+                query.answer('جوین نشدی که :(')
 
         elif command.split("-")[0] == "youtube":
             pass
 
     except Exception as error:
-        from traceback import extract_tb
-        tb = extract_tb(error.__traceback__)
-        await client.send_message(Admin, f"Error occurred in main_bot.callback_handler, line:{tb[-1].lineno}\nerror:\n\n{error}")
-        await event.respond("مشکلی در سیستم پیش امد, لطفا چند لحظه دیگر دوباره تلاش کنید")
+        import traceback
+        tb = traceback.format_exc()
+        context.bot.send_message(chat_id=Admin, text=f"Error occurred in main_bot.callback_handler, line:{tb.splitlines()[-1]}\nerror:\n\n{error}")
+        query.answer("مشکلی در سیستم پیش امد, لطفا چند لحظه دیگر دوباره تلاش کنید")
 
 
 def go_live():
-    client.start(bot_token=BotToken)
-    print("going live... ,returns error if unsuccesfull")
-    client.run_until_disconnected()
+
+    updater = Updater(token=BotToken, use_context=True)
+    dispatcher = updater.dispatcher
+
+    dispatcher.add_handler(CommandHandler('start', start_handler))
+    dispatcher.add_handler(CommandHandler('help', help_handler))
+    dispatcher.add_handler(MessageHandler(Filters.text, link_handler))
+    dispatcher.add_handler(CallbackQueryHandler(callback_handler))
+
+    print("goin live ...")
+    updater.start_polling()
+    print("bot is live.")
+
+    updater.idle()

@@ -26,7 +26,7 @@ def getinfo(link):
     for stream in yt.streams:
 
         if stream.mime_type.startswith("video") and not stream.is_progressive:
-            if not stream.resolution in data:
+            if stream.resolution not in data:
                 data[stream.resolution] = {"itag": stream.itag,
                                            "size": round(stream.filesize / (1024 * 1024), 1)}
 
