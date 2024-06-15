@@ -18,7 +18,7 @@ sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 def spot_download(link, bitrate="320k"):
 
-    command = f"spotdl --bitrate {bitrate} {link}"
+    # command = f"spotdl --bitrate {bitrate} {link}"
 
     command = f"spotdl --bitrate {bitrate} --output-dir {Home}dwonloaders/cache/ {link}"
 

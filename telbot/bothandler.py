@@ -17,7 +17,7 @@ def start_handler(update: Update, context: CallbackContext):
                 update.effective_chat.last_name,
                 update.effective_chat.username
         ):
-            log_text = f"chat_id: `{chat_id}`\nname: {update.effective_chat.first_name}-{update.effective_chat.last_name}\nusername: @{update.effective_chat.username}"
+            log_text = f"chat_id: {chat_id}\nname: {update.effective_chat.first_name}_{update.effective_chat.last_name}\nusername: @{update.effective_chat.username}"
             context.bot.send_message(chat_id=Admin, text=log_text)
 
         if channel.is_member(chat_id):
@@ -35,7 +35,7 @@ def start_handler(update: Update, context: CallbackContext):
 def help_handler(update: Update, context: CallbackContext):
     update.message.reply_text("how to use the bot : \n\n ....")
     if not channel.is_member(update.effective_chat.id):
-        update.message.reply_text('لطفا برای استفاده از ربات در کانال ما جوین شوید. :)')
+        update.message.reply_text('لطفا برای استفاده از ربات در کانال ما جوین شوید. :)', reply_markup=keyboards.join_channel_key())
         return
 
 
@@ -80,7 +80,6 @@ def callback_handler(update: Update, context: CallbackContext):
 
 
 def go_live():
-
     updater = Updater(token=BotToken, use_context=True)
     dispatcher = updater.dispatcher
 

@@ -5,12 +5,12 @@ from credentials.creds import Home, Bot, Admin, Apps
 
 
 insta_loader = instaloader.Instaloader()
-try:
-    print("insta logging ...")
-    insta_loader.login(Apps["Instagram"][0], Apps["Instagram"][1])
-    print("insta logged.")
-except Exception as e:
-    print(f"error in insta logging ...error: {e}")
+# try:
+#     print("insta logging ...")
+#     insta_loader.login(Apps["Instagram"][0], Apps["Instagram"][1])
+#     print("insta logged.")
+# except Exception as e:
+#     print(f"error in insta logging ...error: {e}")
 
 def download_slide(video_url, filename):
 
