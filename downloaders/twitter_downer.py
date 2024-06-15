@@ -10,8 +10,9 @@ def download_video(url, name) -> None:
         for chunk in response.iter_content(chunk_size=8192):
             file.write(chunk)
 
+    return f"{Home}downloaders/cache/{name}"
 
-def create_url(context, url):
+def create_url(context, chat_id, url):
 
     api_url = f"https://twitsave.com/info?url={url}"
     try:
@@ -22,8 +23,7 @@ def create_url(context, url):
         highest_quality_url = []
         for item in download_button:
             quality_buttons = item.find_all("a")
-            highest_quality_url.append(quality_buttons[0].get(
-                "href"))  # Highest quality video url
+            highest_quality_url.append(quality_buttons[0].get("href"))  # Highest quality video url
 
         try:
             caption = data.find_all(
@@ -31,7 +31,12 @@ def create_url(context, url):
         except:
             caption = None
 
-        return highest_quality_url, caption
+        files = []
+
+        for url in highest_quality_url:
+            files.append(download_video(url, chat_id))
+
+        return (files, caption)
 
     except Exception as error:
         context.bot.send_message(

@@ -10,8 +10,9 @@ def download(url, itag):
     yt = YouTube(url)
 
     for stream in yt.streams:
-
-        if stream.itag == itag:
+        print(stream.itag)
+        if str(stream.itag) == itag:
+            print("dwoninnnnn", itag, url)
             file = stream.download(output_path=Home + "downloaders/cache/")
             return file
 

@@ -58,9 +58,10 @@ def link_handler(update: Update, context: CallbackContext):
 
 def callback_handler(update: Update, context: CallbackContext):
     query = update.callback_query
+
     chat_id = query.from_user.id
     command = query.data
-    print(command)
+
     try:
         if command == 'joined':
             if channel.is_member(chat_id):
@@ -68,8 +69,8 @@ def callback_handler(update: Update, context: CallbackContext):
             else:
                 query.answer('جوین نشدی که :(')
 
-        elif command.split("-")[0] == "youtube":
-            pass
+        elif command.startswith("youtube"):
+            downer.youtube_callback(update, context)
 
     except Exception as error:
         import traceback
