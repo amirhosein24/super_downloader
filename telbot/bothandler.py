@@ -1,5 +1,5 @@
 
-import database.DataBase as db
+import database.database as db
 from telbot import keyboards, channel, downer
 from credentials.creds import Admin, BotToken
 
@@ -8,6 +8,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 
 
 def start_handler(update: Update, context: CallbackContext):
+
     chat_id = update.effective_chat.id
 
     try:
@@ -21,22 +22,24 @@ def start_handler(update: Update, context: CallbackContext):
             context.bot.send_message(chat_id=Admin, text=log_text)
 
         if channel.is_member(chat_id):
-            update.message.reply_text(f"wellcome to our bot")
+            update.message.reply_text(
+                f"wellcome to our bot", reply_markup=keyboards.MainKey)
         else:
-            update.message.reply_text("hosde", reply_markup=keyboards.join_channel_key())
+            update.message.reply_text(
+                "join dudeeee", reply_markup=keyboards.join_channel_key())
 
     except Exception as error:
-        import traceback
-        tb = traceback.format_exc()
-        context.bot.send_message(chat_id=Admin, text=f"Error occurred in bothandler.start_handler, line:{tb.splitlines()[-1]}\nerror:\n\n{error}")
-        update.message.reply_text("مشکلی در سیستم پیش امد, لطفا چند لحظه دیگر دوباره تلاش کنید")
+        from traceback import format_exc
+        tb = format_exc()
+        context.bot.send_message(
+            chat_id=Admin, text=f"Error occurred in bothandler.start_handler, line:{tb.splitlines()[-1]}\nerror:\n\n{error}")
+        update.message.reply_text(
+            "مشکلی در سیستم پیش امد, لطفا چند لحظه دیگر دوباره تلاش کنید")
 
 
 def help_handler(update: Update, context: CallbackContext):
-    update.message.reply_text("how to use the bot : \n\n ....")
-    if not channel.is_member(update.effective_chat.id):
-        update.message.reply_text('لطفا برای استفاده از ربات در کانال ما جوین شوید. :)', reply_markup=keyboards.join_channel_key())
-        return
+    update.message.reply_text(
+        "how to use the bot : \n\n ....", reply_markup=keyboards.BackKey)
 
 
 def link_handler(update: Update, context: CallbackContext):
@@ -46,19 +49,22 @@ def link_handler(update: Update, context: CallbackContext):
         link = update.message.text
 
         if not channel.is_member(chat_id):
-            update.message.reply_text('لطفا برای استفاده از ربات در کانال ما جوین شوید. :)')
+            update.message.reply_text(
+                'لطفا برای استفاده از ربات در کانال ما جوین شوید. :)')
             return
 
         downer.thread_handler(update, context)
 
     except Exception as error:
-        update.message.reply_text('ی مشکلی پیش اومد ببشید, دوباره بفرست براddddddddddddddم شاید تونستم')
-        context.bot.send_message(chat_id=Admin, text=f'error in bothandler.link_handler by:`{chat_id}`\nlink:-----\n{link}\nerror:-----\n{error}')
+        update.message.reply_text(
+            'ی مشکلی پیش اومد ببشید, دوباره بفرست شاید تونستم')
+        context.bot.send_message(
+            chat_id=Admin, text=f'error in bothandler.link_handler by:{chat_id}\nlink:-----\n{link}\nerror:-----\n{error}')
 
 
 def callback_handler(update: Update, context: CallbackContext):
-    query = update.callback_query
 
+    query = update.callback_query
     chat_id = query.from_user.id
     command = query.data
 
@@ -69,14 +75,16 @@ def callback_handler(update: Update, context: CallbackContext):
             else:
                 query.answer('جوین نشدی که :(')
 
-        elif command.startswith("youtube"):
-            downer.youtube_callback(update, context)
+        elif command.startswith("downloadcallback"):
+            downer.download_callback(update, context)
 
     except Exception as error:
-        import traceback
-        tb = traceback.format_exc()
-        context.bot.send_message(chat_id=Admin, text=f"Error occurred in main_bot.callback_handler, line:{tb.splitlines()[-1]}\nerror:\n\n{error}")
-        query.answer("مشکلی در سیستم پیش امد, لطفا چند لحظه دیگر دوباره تلاش کنید")
+        from traceback import format_exc
+        tb = format_exc()
+        context.bot.send_message(
+            chat_id=Admin, text=f"Error occurred in main_bot.callback_handler, line:{tb.splitlines()[-1]}\nerror:\n\n{error}")
+        query.message.reply_text(
+            "مشکلی در سیستم پیش امد, لطفا چند لحظه دیگر دوباره تلاش کنید")
 
 
 def go_live():

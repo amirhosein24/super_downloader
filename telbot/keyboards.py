@@ -1,17 +1,31 @@
 
 from credentials.creds import Channel, Sponsor
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
+
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 def join_channel_key():
     keyboard = []
     for channel_name in Channel:
-        keyboard.append([InlineKeyboardButton(channel_name, url=Channel[channel_name]["link"])])
-    keyboard.append([InlineKeyboardButton("جوین شدم :)))", callback_data='joined')])
+        keyboard.append([InlineKeyboardButton(
+            channel_name, url=Channel[channel_name]["link"])])
+    keyboard.append([InlineKeyboardButton("جوین شدم :)))",
+                    callback_data='joined')])
     return InlineKeyboardMarkup(keyboard)
 
+# SponsorKeyboard = [[InlineKeyboardButton(item, url=Sponsor[item])] for item in Sponsor.keys()]
 
-SponsorKeyboard = [[InlineKeyboardButton(item, url=Sponsor[item])] for item in Sponsor.keys()]
+
+def spotify_key(link):
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                "128K", callback_data=f"downcallback_spotify_128k_{link}"),
+            InlineKeyboardButton(
+                "320K", callback_data=f"downcallback_spotify_320k_{link}")
+        ]
+    ]
+    return keyboard
 
 
 def youtube_key(link, data):
@@ -25,17 +39,21 @@ def youtube_key(link, data):
             size = data[res1]["size"]
             tag = data[res1]["itag"]
             if res1.endswith("bps"):
-                button1 = InlineKeyboardButton(f"فایل صوتی -- {res1} -- {size}MB", callback_data=f"youtube-{tag}-{link}")
+                button1 = InlineKeyboardButton(
+                    f"فایل صوتی -- {res1} -- {size}MB", callback_data=f"downcallback_youtube_{tag}_{link}")
             else:
-                button1 = InlineKeyboardButton(f"{res1} -- {size}MB", callback_data=f"youtube-{tag}-{link}")
+                button1 = InlineKeyboardButton(
+                    f"{res1} -- {size}MB", callback_data=f"downcallback_youtube_{tag}_{link}")
 
         if res2 and res2 not in ["title", "length"]:
             size = data[res2]["size"]
             tag = data[res2]["itag"]
             if res2.endswith("bps"):
-                button2 = InlineKeyboardButton(f"فایل صوتی -- {res2} -- {size}MB", callback_data=f"youtube-{tag}-{link}")
+                button2 = InlineKeyboardButton(
+                    f"فایل صوتی -- {res2} -- {size}MB", callback_data=f"downcallback_youtube_{tag}_{link}")
             else:
-                button2 = InlineKeyboardButton(f"{res2} -- {size}MB", callback_data=f"youtube-{tag}-{link}")
+                button2 = InlineKeyboardButton(
+                    f"{res2} -- {size}MB", callback_data=f"downcallback_youtube_{tag}_{link}")
 
         try:
             if res2:
@@ -48,11 +66,65 @@ def youtube_key(link, data):
     return InlineKeyboardMarkup(keyboard)
 
 
+BackKey = [
+    [
+        InlineKeyboardButton("back", callback_data="back_to_main")
+    ]
+]
+BackKey = InlineKeyboardButton(BackKey)
 
-AdminKeyboard = [[InlineKeyboardButton("send to all", callback_data='sendall')],
-                 [InlineKeyboardButton("send data base", callback_data='db')]]
 
-BuyMenu = [[InlineKeyboardButton("1 ماه : 49,000 تومان", url='https://zarinp.al/544899')]]
+MainKey = [
+    [
+        InlineKeyboardButton("helppp", callback_data="help")
+    ],
+    [
+        InlineKeyboardButton("yupppp", callback_data="account")
+    ]
+]
+MainKey = InlineKeyboardMarkup(MainKey)
 
-AdminPaymentMenu = [[InlineKeyboardButton("1 month", callback_data="month-1")],
-                    [InlineKeyboardButton("none", callback_data="month-0")]]
+
+AdminKeyboard = [
+    [
+        InlineKeyboardButton("send to all", callback_data='admin_sendtoall')
+    ],
+    [
+        InlineKeyboardButton("send data base", callback_data='admin_getdb')
+    ]
+]
+AdminKeyboard = InlineKeyboardMarkup(AdminKeyboard)
+
+
+AccountMenu = [
+    [
+        InlineKeyboardButton("خرید اشتراک ویژه", callback_data="get_prem")
+    ],
+    [
+        InlineKeyboardButton("back", callback_data="back_to_main")
+    ]
+]
+AccountMenu = InlineKeyboardMarkup(AccountMenu)
+
+
+BuyMenu = [
+    [
+        InlineKeyboardButton("1 ماه : 49,000 تومان",
+                             url='https://zarinp.al/544899')
+    ],
+    [
+        InlineKeyboardButton("back", callback_data="back_to_main")
+    ]
+]
+BuyMenu = InlineKeyboardMarkup(BuyMenu)
+
+
+AdminPaymentMenu = [
+    [
+        InlineKeyboardButton("1 month", callback_data="month-1")
+    ],
+    [
+        InlineKeyboardButton("none", callback_data="month-0")
+    ]
+]
+AdminPaymentMenu = InlineKeyboardMarkup(AdminPaymentMenu)
