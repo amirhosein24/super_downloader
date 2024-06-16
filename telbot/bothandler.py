@@ -9,19 +9,17 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 
 def start_handler(update: Update, context: CallbackContext):
 
-    chat_id = update.effective_chat.id
-
     try:
         if db.add_user(
-                chat_id,
+                update.effective_chat.id,
                 update.effective_chat.first_name,
                 update.effective_chat.last_name,
                 update.effective_chat.username
         ):
-            log_text = f"chat_id: {chat_id}\nname: {update.effective_chat.first_name}_{update.effective_chat.last_name}\nusername: @{update.effective_chat.username}"
+            log_text = f"chat_id: {update.effective_chat.id}\nname: {update.effective_chat.first_name}_{update.effective_chat.last_name}\nusername: @{update.effective_chat.username}"
             context.bot.send_message(chat_id=Admin, text=log_text)
 
-        if channel.is_member(chat_id):
+        if channel.is_member(update.effective_chat.id):
             update.message.reply_text(
                 f"wellcome to our bot", reply_markup=keyboards.MainKey)
         else:
@@ -43,8 +41,8 @@ def help_handler(update: Update, context: CallbackContext):
 
 
 def link_handler(update: Update, context: CallbackContext):
-    try:
 
+    try:
         chat_id = update.effective_chat.id
         link = update.message.text
 
@@ -71,11 +69,33 @@ def callback_handler(update: Update, context: CallbackContext):
     try:
         if command == 'joined':
             if channel.is_member(chat_id):
-                query.edit_message_text('ربات فعال شد الان میتونی استفاده کنی')
+                query.edit_message_text('ربات فعال شد الان میتونی استفاده کنی', reply_markup=keyboards.MainKey)
             else:
                 query.answer('جوین نشدی که :(')
 
-        elif command.startswith("downloadcallback"):
+        elif command == "help":
+            print("ssssssss")
+            query.edit_message_text(
+                "how to use the bot : \n\n ....", reply_markup=keyboards.BackKey)
+
+        elif command == "account":
+            query.edit_message_text(
+                "acount texttttttt", reply_markup=keyboards.AccountMenu)
+
+        elif command == "back_to_main":
+            query.edit_message_text(
+                f"main menu", reply_markup=keyboards.MainKey)
+
+        elif command == "back_to_account":
+            query.edit_message_text(
+                f"acount texttttttt", reply_markup=keyboards.AccountMenu)
+
+        elif command == "get_prem":
+            query.edit_message_text(
+                f"main menu", reply_markup=keyboards.BuyMenu)
+
+
+        elif command.startswith("dcb"):
             downer.download_callback(update, context)
 
     except Exception as error:

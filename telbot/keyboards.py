@@ -20,9 +20,9 @@ def spotify_key(link):
     keyboard = [
         [
             InlineKeyboardButton(
-                "128K", callback_data=f"downcallback_spotify_128k_{link}"),
+                "128K", callback_data=f"dcb_spotify_128k_{link}"),
             InlineKeyboardButton(
-                "320K", callback_data=f"downcallback_spotify_320k_{link}")
+                "320K", callback_data=f"dcb_spotify_320k_{link}")
         ]
     ]
     return keyboard
@@ -31,6 +31,7 @@ def spotify_key(link):
 def youtube_key(link, data):
     keyboard = []
     keys = list(data.keys())
+
     for i in range(0, len(keys), 2):
         res1 = keys[i]
         res2 = keys[i+1] if i+1 < len(keys) else None
@@ -40,20 +41,20 @@ def youtube_key(link, data):
             tag = data[res1]["itag"]
             if res1.endswith("bps"):
                 button1 = InlineKeyboardButton(
-                    f"فایل صوتی -- {res1} -- {size}MB", callback_data=f"downcallback_youtube_{tag}_{link}")
+                    f"فایل صوتی -- {res1} -- {size}MB", callback_data=f"dcb_youtube_{tag}_{link}")
             else:
                 button1 = InlineKeyboardButton(
-                    f"{res1} -- {size}MB", callback_data=f"downcallback_youtube_{tag}_{link}")
+                    f"{res1} -- {size}MB", callback_data=f"dcb_youtube_{tag}_{link}")
 
         if res2 and res2 not in ["title", "length"]:
             size = data[res2]["size"]
             tag = data[res2]["itag"]
             if res2.endswith("bps"):
                 button2 = InlineKeyboardButton(
-                    f"فایل صوتی -- {res2} -- {size}MB", callback_data=f"downcallback_youtube_{tag}_{link}")
+                    f"فایل صوتی -- {res2} -- {size}MB", callback_data=f"dcb_youtube_{tag}_{link}")
             else:
                 button2 = InlineKeyboardButton(
-                    f"{res2} -- {size}MB", callback_data=f"downcallback_youtube_{tag}_{link}")
+                    f"{res2} -- {size}MB", callback_data=f"dcb_youtube_{tag}_{link}")
 
         try:
             if res2:
@@ -66,12 +67,10 @@ def youtube_key(link, data):
     return InlineKeyboardMarkup(keyboard)
 
 
-BackKey = [
-    [
-        InlineKeyboardButton("back", callback_data="back_to_main")
-    ]
-]
-BackKey = InlineKeyboardButton(BackKey)
+BackKey = [[
+    InlineKeyboardButton("back", callback_data="back_to_main")
+]]
+BackKey = InlineKeyboardMarkup(BackKey)
 
 
 MainKey = [
@@ -113,7 +112,7 @@ BuyMenu = [
                              url='https://zarinp.al/544899')
     ],
     [
-        InlineKeyboardButton("back", callback_data="back_to_main")
+        InlineKeyboardButton("back", callback_data="back_to_account")
     ]
 ]
 BuyMenu = InlineKeyboardMarkup(BuyMenu)
