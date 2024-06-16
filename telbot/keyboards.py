@@ -41,7 +41,7 @@ def youtube_key(link, data):
             tag = data[res1]["itag"]
             if res1.endswith("bps"):
                 button1 = InlineKeyboardButton(
-                    f"فایل صوتی -- {res1} -- {size}MB", callback_data=f"dcb_youtube_{tag}_{link}")
+                    f"فایل صوتی - {res1} - {size}MB", callback_data=f"dcb_youtube_{tag}_{link}")
             else:
                 button1 = InlineKeyboardButton(
                     f"{res1} -- {size}MB", callback_data=f"dcb_youtube_{tag}_{link}")
@@ -51,7 +51,7 @@ def youtube_key(link, data):
             tag = data[res2]["itag"]
             if res2.endswith("bps"):
                 button2 = InlineKeyboardButton(
-                    f"فایل صوتی -- {res2} -- {size}MB", callback_data=f"dcb_youtube_{tag}_{link}")
+                    f"فایل صوتی - {res2} - {size}MB", callback_data=f"dcb_youtube_{tag}_{link}")
             else:
                 button2 = InlineKeyboardButton(
                     f"{res2} -- {size}MB", callback_data=f"dcb_youtube_{tag}_{link}")

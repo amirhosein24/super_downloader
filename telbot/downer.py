@@ -1,6 +1,7 @@
 
+
 from downloaders import youtube_downer, insta_downer, twitter_downer, direct_downer, spotify_downer
-from telbot import keyboards
+from telbot import keyboards, uploader
 
 from threading import Lock, Thread
 import asyncio
@@ -20,6 +21,25 @@ def thread_handler(update, context):
         else:
             thread_list.append(chat_id)
             Thread(target=link_handler, args=(update, context, )).start()
+
+
+def thread_callback_handler(update, context):
+
+    query = update.callback_query
+    chat_id = query.from_user.id
+
+
+    with var_lock:
+        if chat_id in thread_list:
+            query.message.reply_text(
+                "waint dudeeeeeeee", reply_to_message_id=update.message.message_id)
+            return
+        else:
+            thread_list.append(chat_id)
+            Thread(target=download_callback, args=(update, context, )).start()
+
+
+
 
 
 def link_handler(update, context):
@@ -94,21 +114,15 @@ def download_callback(update, context):
 
     _, platform, tag, link = command.split("_")
 
-    with var_lock:
-        if chat_id in thread_list:
-            query.message.reply_text("wait dudeeeeeeeeee")
-            return
-
-        thread_list.append(chat_id)
-
     try:
         if platform == "spotify":
             pass
 
         elif platform == "youtube":
 
-            files = youtube_downer.download(link, tag)
+            files = youtube_downer.download(chat_id, link, tag)
             print(files)
+            asyncio.run(uploader.send_to(chat_id, files, "----caption"))
 
     except Exception as e:
         print(e)

@@ -4,19 +4,50 @@ from credentials.creds import Home
 from pytube import YouTube
 from datetime import timedelta
 
+import subprocess
 
-def download(url, itag):
+# video_path = 'path_to_your_video.mp4'
+# audio_path = 'path_to_your_audio.mp4'
+# output_path = 'path_to_your_output.mp4'
+from os import remove, path
+
+def download(chat_id, url, itag):
 
     yt = YouTube(url)
 
-    for stream in yt.streams:
-        print(stream.itag)
-        if str(stream.itag) == itag:
-            print("dwoninnnnn", itag, url)
-            file = stream.download(output_path=Home + "downloaders/cache/")
-            return file
+    try:
+        for stream in yt.streams:
 
-    return False
+            if str(stream.itag) == "139":
+                audio_file = stream.download(
+                    output_path=Home + f"downloaders/cache/", filename=f"{chat_id}_audio.mp4")
+
+            elif str(stream.itag) == itag:
+                video_file = stream.download(
+                    output_path=Home + f"downloaders/cache/", filename=f"{chat_id}_video.mp4")
+
+        command = [
+            'ffmpeg',
+            '-i', video_file,
+            '-i', audio_file,
+            '-c:v', 'copy',
+            '-c:a', 'aac',
+            '-strict', 'experimental',
+            Home + "downloaders/cache/" + yt.title + ".mp4"
+        ]
+
+        subprocess.run(command)
+        return Home + "downloaders/cache/" + yt.title + ".mp4"
+
+    except Exception as e:
+        print(e)
+        return False
+
+    finally:
+        if path.exists(video_file):
+            remove(video_file)
+        if path.exists(audio_file):
+            remove(audio_file)
 
 
 def getinfo(link):
@@ -41,5 +72,7 @@ def getinfo(link):
 
         data["title"], data["length"] = yt.title, str(
             timedelta(seconds=yt.length))  # in seconds
+
+    print(data)
 
     return data
