@@ -74,7 +74,6 @@ def callback_handler(update: Update, context: CallbackContext):
                 query.answer('جوین نشدی که :(')
 
         elif command == "help":
-            print("ssssssss")
             query.edit_message_text(
                 "how to use the bot : \n\n ....", reply_markup=keyboards.BackKey)
 

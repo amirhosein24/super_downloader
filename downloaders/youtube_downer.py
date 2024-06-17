@@ -40,7 +40,7 @@ def download(chat_id, url, itag):
         return Home + "downloaders/cache/" + yt.title + ".mp4"
 
     except Exception as e:
-        print(e)
+        print(f"error in yt downer download : {e}")
         return False
 
     finally:
@@ -72,7 +72,5 @@ def getinfo(link):
 
         data["title"], data["length"] = yt.title, str(
             timedelta(seconds=yt.length))  # in seconds
-
-    print(data)
 
     return data
