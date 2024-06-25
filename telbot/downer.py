@@ -23,7 +23,6 @@ thread_list = []
 
 
 def thread_handler(update, context):
-
     chat_id = update.effective_chat.id
 
     with var_lock:
@@ -101,7 +100,6 @@ def link_handler(update, context):
             if chat_id in thread_list:
                 thread_list.remove(chat_id)
 
-import asyncio
 
 def download_callback(update, context):
 

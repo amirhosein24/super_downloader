@@ -93,8 +93,7 @@ def callback_handler(update: Update, context: CallbackContext):
             query.edit_message_text(
                 f"main menu", reply_markup=keyboards.BuyMenu)
 
-
-        elif command.startswith("dcb"):
+        elif command.startswith("dcb"): # download callback handler
             downer.download_callback(update, context)
 
     except Exception as error:

@@ -3,6 +3,7 @@ from credentials.creds import ApiHash, ApiId, Admin, BotToken, Home
 from os import remove
 
 # telethon client to send files to user
+print("MTPROTO going live...")
 client = TelegramClient(f"{Home}telbot/uploader", api_id=ApiId, api_hash=ApiHash).start(bot_token=BotToken)
 
 
@@ -26,23 +27,23 @@ async def send_to(chat_id, file_path, caption):
     #             remove(item)
 
 
-# TODO how to run send_to func ????
-
-import asyncio
-from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext
-
-def start(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text('Hello! Welcome to your new bot.')
-
-
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    print("fdsfsdf")
-    asyncio.run(send_to(5097685770, r"D:\elevoc_dnn_kernel.log", "+++++++"))
-
-updater = Updater(BotToken)
-dispatcher = updater.dispatcher
-dispatcher.add_handler(CommandHandler("start", start))
-updater.start_polling()
-updater.idle()
+# # TODO how to run send_to func ????
+#
+# import asyncio
+# from telegram import Update
+# from telegram.ext import Updater, CommandHandler, CallbackContext
+#
+# def start(update: Update, context: CallbackContext) -> None:
+#     update.message.reply_text('Hello! Welcome to your new bot.')
+#
+#
+#     loop = asyncio.new_event_loop()
+#     asyncio.set_event_loop(loop)
+#     print("fdsfsdf")
+#     asyncio.run(send_to(5097685770, r"D:\elevoc_dnn_kernel.log", "+++++++"))
+#
+# updater = Updater(BotToken)
+# dispatcher = updater.dispatcher
+# dispatcher.add_handler(CommandHandler("start", start))
+# updater.start_polling()
+# updater.idle()

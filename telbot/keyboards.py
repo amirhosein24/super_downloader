@@ -36,9 +36,10 @@ def youtube_key(link, data):
         res1 = keys[i]
         res2 = keys[i+1] if i+1 < len(keys) else None
 
+        size = data[res2]["size"]
+        tag = data[res2]["itag"]
+
         if res1 not in ["title", "length"]:
-            size = data[res1]["size"]
-            tag = data[res1]["itag"]
             if res1.endswith("bps"):
                 button1 = InlineKeyboardButton(
                     f"فایل صوتی - {res1} - {size}MB", callback_data=f"dcb_youtube_{tag}_{link}")
@@ -47,8 +48,6 @@ def youtube_key(link, data):
                     f"{res1} -- {size}MB", callback_data=f"dcb_youtube_{tag}_{link}")
 
         if res2 and res2 not in ["title", "length"]:
-            size = data[res2]["size"]
-            tag = data[res2]["itag"]
             if res2.endswith("bps"):
                 button2 = InlineKeyboardButton(
                     f"فایل صوتی - {res2} - {size}MB", callback_data=f"dcb_youtube_{tag}_{link}")
@@ -78,7 +77,7 @@ MainKey = [
         InlineKeyboardButton("helppp", callback_data="help")
     ],
     [
-        InlineKeyboardButton("yupppp", callback_data="account")
+        InlineKeyboardButton("me acount", callback_data="account")
     ]
 ]
 MainKey = InlineKeyboardMarkup(MainKey)
