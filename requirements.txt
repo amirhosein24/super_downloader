@@ -1,4 +1,4 @@
-python-telegram-bot==13.5
+python-telegram-bot==20.8
 SQLAlchemy~=2.0.30
 bs4~=0.0.2
 requests~=2.32.3
