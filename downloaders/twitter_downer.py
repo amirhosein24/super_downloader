@@ -1,7 +1,10 @@
 import requests
-from bs4 import BeautifulSoup
 import re
 from typing import List, Dict, Any, Optional
+
+# Suppress the InsecureRequestWarning
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 def extract_tweet_ids(text: str) -> Optional[List[str]]:
     """Extract tweet IDs from message."""
@@ -27,7 +30,7 @@ def scrape_media(tweet_id: int) -> List[Dict[str, Any]]:
         print("Scraped Tweet Data:", tweet_data)
 
         media_extended = tweet_data.get('media_extended', [])
-        tweet_text = tweet_data.get('full_text', '')
+        tweet_text = tweet_data.get('text', '')  # Ensure the correct key is used for the caption
 
         # Combine the media data with the tweet text (caption)
         media_with_captions = []
@@ -63,7 +66,7 @@ def download_media(tweet_media: List[dict], chat_id) -> List[str]:
             else:
                 continue
 
-            filename = f"{chat_id}_{media['media']['type']}_{media['media']['id']}.{file_extension}"
+            filename = f"{chat_id}_{media['media']['type']}.{file_extension}"
             filepath = f"downloaders/cache/{filename}"
 
             with open(filepath, "wb") as file:
