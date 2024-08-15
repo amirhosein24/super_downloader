@@ -51,23 +51,26 @@ def getinfo(link):
 
     yt = YouTube(link)
     data = {}
+    print("here")
 
     for stream in yt.streams:
         print(stream)
         if stream.mime_type.startswith("video") and not stream.is_progressive:
             if stream.resolution not in data:
-                data[stream.resolution] = {"itag": stream.itag,
-                                           "size": round(stream.filesize / (1024 * 1024), 1)}
+                data[stream.resolution] = {
+                    "itag": stream.itag, "size": round(stream.filesize / (1024 * 1024), 1)
+                }
 
             elif stream.mime_type.split("/")[1] == "mp4":
-                data[stream.resolution] = {"itag": stream.itag,
-                                           "size": round(stream.filesize / (1024 * 1024), 1)}
+                data[stream.resolution] = {
+                    "itag": stream.itag, "size": round(stream.filesize / (1024 * 1024), 1)
+                }
 
         elif stream.mime_type == "audio/mp4":
-            data[stream.abr] = {"itag": stream.itag,
-                                "size": round(stream.filesize / (1024 * 1024), 1)}
+            data[stream.abr] = {
+                "itag": stream.itag, "size": round(stream.filesize / (1024 * 1024), 1)
+            }
 
-        data["title"], data["length"] = yt.title, str(
-            timedelta(seconds=yt.length))  # in seconds
+        data["title"], data["length"] = yt.title, str(timedelta(seconds=yt.length))  # in seconds
 
     return data

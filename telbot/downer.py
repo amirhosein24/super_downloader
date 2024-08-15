@@ -91,7 +91,8 @@ def link_handler(update, context):
 
             waitmessage = update.message.reply_text(
                 "twiterrrr yooooo", reply_to_message_id=update.message.message_id)
-            files, caption = twitter_downer.create_url(context, chat_id, link)
+            files, caption = twitter_downer.main_download(context, chat_id, link)
+            print(files, caption)
 
         elif link.startswith("https://open.spotify.com/"):
             track_id = link.split('/')[-1]
@@ -107,7 +108,7 @@ def link_handler(update, context):
                 f"file size is  {file_size}", reply_to_message_id=update.message.message_id)
 
         if files:
-            uploader.sender(chat_id, files, "caption")
+            uploader.sender(chat_id, files, caption)
 
     except Exception as e:
         print(f"error in link handler e:{e}")
