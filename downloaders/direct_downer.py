@@ -1,6 +1,8 @@
+
 from urllib.parse import urlparse
-from credentials.creds import Home
 from requests import get, head
+
+from credentials.creds import Home
 
 
 def download(url):

@@ -1,16 +1,18 @@
 
 import requests
 import instaloader
+
 from credentials.creds import Home, Bot, Admin, Apps
 
 
 insta_loader = instaloader.Instaloader()
-# try:
-#     print("insta logging ...")
-#     insta_loader.login(Apps["Instagram"][0], Apps["Instagram"][1])
-#     print("insta logged.")
+# try: # log in the instagram acount
+#     print("logging for instagram ...", end=" ")
+#     insta_loader.login(Apps["instagram"]["username"], Apps["instagram"]["password"])
+#     print("done.")
 # except Exception as e:
-#     print(f"error in insta logging ...error: {e}")
+#     print(f"error: {e}")
+
 
 def download_slide(video_url, filename):
 
@@ -28,7 +30,6 @@ def download_slide(video_url, filename):
 def instagram(chat_id, link):
 
     try:
-
         shortcode = link.split('/')[-2]
         post = instaloader.Post.from_shortcode(insta_loader.context, shortcode)
 

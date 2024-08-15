@@ -16,7 +16,7 @@ client_credentials_manager = SpotifyClientCredentials(
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 
-def spot_download(link, bitrate="320k"):
+def spot_download(link, bitrate="128k"):
 
     # command = f"spotdl --bitrate {bitrate} {link}"
 

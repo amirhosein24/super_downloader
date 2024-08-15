@@ -1,15 +1,13 @@
 
-
 from telegram import ChatMember
 from credentials.creds import Channel, Bot, Admin
 
 
 def is_member(chat_id):
-    for channel in Channel:
 
+    for channel_name in Channel:
         try:
-            chat_member = Bot.get_chat_member(chat_id=Channel[channel], user_id=chat_id)
-            if chat_member.status not in [ChatMember.MEMBER, ChatMember.ADMINISTRATOR, ChatMember.CREATOR]:
+            if Bot.get_chat_member(chat_id=Channel[channel_name]["id"], user_id=chat_id).status not in [ChatMember.MEMBER, ChatMember.ADMINISTRATOR, ChatMember.CREATOR]:
                 return False
 
         except Exception as error:

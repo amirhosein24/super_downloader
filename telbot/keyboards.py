@@ -6,23 +6,27 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 def join_channel_key():
     keyboard = []
-    for channel_name in Channel:
-        keyboard.append([InlineKeyboardButton(
-            channel_name, url=Channel[channel_name]["link"])])
-    keyboard.append([InlineKeyboardButton("جوین شدم :)))",
-                    callback_data='joined')])
-    return InlineKeyboardMarkup(keyboard)
 
-# SponsorKeyboard = [[InlineKeyboardButton(item, url=Sponsor[item])] for item in Sponsor.keys()]
+    for channel_name in Channel:
+        keyboard.append(
+            [
+                InlineKeyboardButton(channel_name, url=Channel[channel_name]["url"])
+            ]
+        )
+
+    keyboard.append(
+        [
+            InlineKeyboardButton("جوین شدم :)))", callback_data='joined')
+        ]
+    )
+    return InlineKeyboardMarkup(keyboard)
 
 
 def spotify_key(link):
     keyboard = [
         [
-            InlineKeyboardButton(
-                "128K", callback_data=f"dcb_spotify_128k_{link}"),
-            InlineKeyboardButton(
-                "320K", callback_data=f"dcb_spotify_320k_{link}")
+            InlineKeyboardButton("128K", callback_data=f"dcb_spotify_128k_{link}"),
+            InlineKeyboardButton("320K", callback_data=f"dcb_spotify_320k_{link}")
         ]
     ]
     return keyboard
@@ -66,6 +70,14 @@ def youtube_key(link, data):
     return InlineKeyboardMarkup(keyboard)
 
 
+SponsorKeyboard = [
+    [
+        InlineKeyboardButton(item, url=Sponsor[item])
+    ] for item in Sponsor.keys()
+]
+SponsorKeyboard = InlineKeyboardMarkup(SponsorKeyboard)
+
+
 BackKey = [[
     InlineKeyboardButton("back", callback_data="back_to_main")
 ]]
@@ -83,17 +95,6 @@ MainKey = [
 MainKey = InlineKeyboardMarkup(MainKey)
 
 
-AdminKeyboard = [
-    [
-        InlineKeyboardButton("send to all", callback_data='admin_sendtoall')
-    ],
-    [
-        InlineKeyboardButton("send data base", callback_data='admin_getdb')
-    ]
-]
-AdminKeyboard = InlineKeyboardMarkup(AdminKeyboard)
-
-
 AccountMenu = [
     [
         InlineKeyboardButton("خرید اشتراک ویژه", callback_data="get_prem")
@@ -107,7 +108,7 @@ AccountMenu = InlineKeyboardMarkup(AccountMenu)
 
 BuyMenu = [
     [
-        InlineKeyboardButton("1 ماه : 49,000 تومان",
+        InlineKeyboardButton("3 ماه : 49,000 تومان",
                              url='https://zarinp.al/544899')
     ],
     [
@@ -117,9 +118,23 @@ BuyMenu = [
 BuyMenu = InlineKeyboardMarkup(BuyMenu)
 
 
+#  ########################################## admin keyboards ##########################################
+AdminMainKey = [
+    [
+        InlineKeyboardButton("send to all", callback_data='sendtoall')
+    ],
+    [
+        InlineKeyboardButton("send data base", callback_data='getdb')
+    ],
+    [
+        InlineKeyboardButton('view thread list', callback_data='view_threadlist')
+    ]
+]
+AdminMainKey = InlineKeyboardMarkup(AdminMainKey)
+
 AdminPaymentMenu = [
     [
-        InlineKeyboardButton("1 month", callback_data="month-1")
+        InlineKeyboardButton("3 month", callback_data="month-3")
     ],
     [
         InlineKeyboardButton("none", callback_data="month-0")

@@ -1,18 +1,15 @@
 
-from credentials.creds import Home
 
 from pytube import YouTube
 from datetime import timedelta
 
-import subprocess
-
-# video_path = 'path_to_your_video.mp4'
-# audio_path = 'path_to_your_audio.mp4'
-# output_path = 'path_to_your_output.mp4'
+from subprocess import run
 from os import remove, path
 
-def download(chat_id, url, itag):
+from credentials.creds import Home
 
+
+def download(chat_id, url, itag):
     yt = YouTube(url)
 
     try:
@@ -36,7 +33,7 @@ def download(chat_id, url, itag):
             Home + "downloaders/cache/" + yt.title + ".mp4"
         ]
 
-        subprocess.run(command)
+        run(command)
         return Home + "downloaders/cache/" + yt.title + ".mp4"
 
     except Exception as e:
@@ -56,7 +53,7 @@ def getinfo(link):
     data = {}
 
     for stream in yt.streams:
-
+        print(stream)
         if stream.mime_type.startswith("video") and not stream.is_progressive:
             if stream.resolution not in data:
                 data[stream.resolution] = {"itag": stream.itag,

@@ -1,53 +1,67 @@
 
-from threading import Lock, Thread
-import asyncio
 
-from credentials.creds import Home
-from downloaders import youtube_downer, insta_downer, twitter_downer, direct_downer, spotify_downer
+from threading import Thread, RLock
+
 from telbot import keyboards, uploader
+from credentials.creds import Admin
+from downloaders import youtube_downer, insta_downer, twitter_downer, direct_downer, spotify_downer
 
 
-def create_cache_folder():
-    from os import mkdir
+var_lock = RLock()
+thread_list = {}
+
+
+def thread_add(update, context):
+    if update.callback_query:
+        update = update.callback_query
+        chat_id = update.from_user.id
+    else:
+        chat_id = update.message.chat.id
+
     try:
-        mkdir(Home + "downloaders/cache/")
-    except:
-        pass
+        acquired = var_lock.acquire(timeout=5)
+        if not acquired:
+            context.bot.send_message(Admin, f"{chat_id} - failed to acquire lock")
+            update.message.reply_text('error happend, pls try again later.')
+            return
 
-
-create_cache_folder()
-
-
-var_lock = Lock()
-thread_list = []
-
-
-def thread_handler(update, context):
-    chat_id = update.effective_chat.id
-
-    with var_lock:
         if chat_id in thread_list:
-            update.message.reply_text(
-                "waint dudeeeeeeee", reply_to_message_id=update.message.message_id)
+            update.message.reply_text('one download at a time')
             return
         else:
-            thread_list.append(chat_id)
+            thread_list[chat_id] = ""
             Thread(target=link_handler, args=(update, context, )).start()
 
+    except Exception as error:
+        context.bot.send_message(Admin, f"error in try var lock, error: {error}")
+        update.message.reply_text('error happend, pls try again later.')
+        return
 
-def thread_callback_handler(update, context):
+    finally:
+        var_lock.release()
 
-    query = update.callback_query
-    chat_id = query.from_user.id
 
-    with var_lock:
+def thread_manage(chat_id, pos):
+    acquired = var_lock.acquire(timeout=5)
+    if not acquired:
+        return False
+    try:
+        thread_list[chat_id] = pos
+        return True
+    finally:
+        var_lock.release()
+
+
+def thread_remove(chat_id):
+    acquired = var_lock.acquire(timeout=5)
+    if not acquired:
+        return False
+    try:
         if chat_id in thread_list:
-            query.message.reply_text(
-                "waint dudeeeeeeee", reply_to_message_id=update.message.message_id)
-            return
-        else:
-            thread_list.append(chat_id)
-            Thread(target=download_callback, args=(update, context, )).start()
+            del thread_list[chat_id]
+        return True
+    finally:
+        var_lock.release()
 
 
 def link_handler(update, context):
@@ -57,16 +71,17 @@ def link_handler(update, context):
         chat_id = update.message.chat_id
         files = None
 
-        if link.startswith("https://www.youtube.com") or link.startswith("https://youtube.com") or link.startswith \
-                ("https://youtu.be"):
+        if link.startswith("https://www.youtube.com") or link.startswith("https://youtube.com") or link.startswith("https://youtu.be"):
 
-            waitmessage = update.message.reply_text(
-                "its you tubeeeeee, wait", reply_to_message_id=update.message.message_id)
+            waitmessage = update.message.reply_text("its you tubeeeeee, wait", reply_to_message_id=update.message.message_id)
             data = youtube_downer.getinfo(link)
+            print(data)
             title, length = data["title"], data["length"]
 
-            context.bot.edit_message_text(chat_id=chat_id, message_id=waitmessage.message_id,
-                                          text=f"کیفیت دانلود خود را انتخاب کنید : \n{title}: {length}", reply_markup=keyboards.youtube_key(link, data))
+            context.bot.edit_message_text(chat_id=chat_id,
+                                          message_id=waitmessage.message_id,
+                                          text=f"کیفیت دانلود خود را انتخاب کنید : \n{title}: {length}",
+                                          reply_markup=keyboards.youtube_key(link, data))
 
         elif link.startswith("https://www.instagram.com") or link.startswith("https://instagram.com"):
             waitmessage = update.message.reply_text("insta yooooooooo", reply_to_message_id=update.message.message_id)
@@ -76,8 +91,7 @@ def link_handler(update, context):
 
             waitmessage = update.message.reply_text(
                 "twiterrrr yooooo", reply_to_message_id=update.message.message_id)
-            files = twitter_downer.create_url(context, chat_id, link)
-            print(files)
+            files, caption = twitter_downer.create_url(context, chat_id, link)
 
         elif link.startswith("https://open.spotify.com/"):
             track_id = link.split('/')[-1]
@@ -92,13 +106,14 @@ def link_handler(update, context):
             waitmessage = update.message.reply_text(
                 f"file size is  {file_size}", reply_to_message_id=update.message.message_id)
 
+        if files:
+            uploader.sender(chat_id, files, "caption")
+
     except Exception as e:
         print(f"error in link handler e:{e}")
 
     finally:
-        with var_lock:
-            if chat_id in thread_list:
-                thread_list.remove(chat_id)
+        thread_remove(chat_id)
 
 
 def download_callback(update, context):
@@ -118,16 +133,12 @@ def download_callback(update, context):
             caption = query.message.text.split("\n")[1]
             # files = youtube_downer.download(chat_id, link, tag)
             print(caption)
-            asyncio.to_thread(
-                uploader.client.loop.run_until_complete(uploader.send_to(chat_id, r"C:\Users\amhei\Documenti\GitHub\telegram\super-downloader\downloaders\cache\lol Apple Intelligence is dumb....mp4", caption))
-            )
-            print("sdsd")
+            uploader.sender(chat_id, r"C:\Users\amhei\Documenti\GitHub\telegram\super-downloader\downloaders\cache\lol Apple Intelligence is dumb....mp4", caption)
+
             context.bot.delete_message(chat_id=chat_id, message_id=query.message.message_id)
 
     except Exception as e:
         print(f"--------{e}")
 
     finally:
-        with var_lock:
-            if chat_id in thread_list:
-                thread_list.remove(chat_id)
+        thread_remove(chat_id)

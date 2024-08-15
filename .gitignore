@@ -5,3 +5,5 @@ test/
 venv/
 telethon.session
 telethon.session-journal
+/telbot/uploader.session
+/telbot/uploader.session-journal

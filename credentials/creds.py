@@ -13,23 +13,31 @@ def load_json():
         print("creds.json file wasnt found, exiting the bot ...")
         _exit(0)
 
-    admin = config["Admin"]
-    bottoken = config["BotToken"]
+    apps = config["apps"]
 
     api_id = config["ApiId"]
     api_hash = config["ApiHash"]
+    bottoken = config["BotToken"]
 
+    admin = config["Admin"]
+    logger = config["logger"]
     channel = config["Channel"]
-
     sponsor = config["Sponsor"]
-    apps = config["apps"]
 
     from telegram import Bot
     bot = Bot(token=bottoken)
 
     del config, load, path, _exit, Bot
 
-    return admin, home, bottoken, api_id, api_hash, channel, sponsor, bot, apps
+    return admin, logger, home, bottoken, api_id, api_hash, channel, sponsor, bot, apps
 
 
-Admin, Home, BotToken, ApiId, ApiHash, Channel, Sponsor, Bot, Apps = load_json()
+Admin, Logger, Home, BotToken, ApiId, ApiHash, Channel, Sponsor, Bot, Apps = load_json()
+
+
+from os import mkdir
+try:
+    mkdir(Home + "downloaders/cache/")
+except:
+    pass
+del mkdir
