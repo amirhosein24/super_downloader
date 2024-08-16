@@ -1,8 +1,8 @@
 
-from telbot.bothandler import updater
-
 
 if __name__ == "__main__":
+
+    from telbot.bothandler import updater
 
     while True:
         try:
@@ -12,6 +12,6 @@ if __name__ == "__main__":
             updater.idle()
 
         except Exception as error:
-            print(f"error in main if, sleeping for 10 sec,  error: {error}")
+            print(f"error happend, sleeping for 30 sec,  error: {error}")
             from time import sleep
             sleep(30)

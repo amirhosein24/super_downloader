@@ -7,3 +7,6 @@ telethon.session
 telethon.session-journal
 /telbot/uploader.session
 /telbot/uploader.session-journal
+/telbot/MTPROTO.session
+/telbot/MTPROTO.session-journal
+/.idea/dataSources.xml

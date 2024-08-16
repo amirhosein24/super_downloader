@@ -87,11 +87,17 @@ def callback_handler(update: Update, context: CallbackContext):
             query.edit_message_text(f"main menu", reply_markup=keyboards.BuyMenu)
 
         elif command.startswith("dcb"):  # download callback handler
-            downer.download_callback(update, context)
+            downer.download_callback(query, context)
 
         elif command == "view_threadlist":
             from telbot.downer import thread_list
-            context.bot.send_message(chat_id=Admin, text=str(thread_list))
+            thread_message = context.bot.send_message(chat_id=Admin, text=str(thread_list))
+            # for i in range(100):   # TODO
+            #     try:
+            #         context.bot.edit_message_text(chat_id=Admin, message_id=thread_message.message_id, text=str(thread_list))
+            #     except:
+            #         pass
+            # context.bot.delete_message(chat_id=Admin, message_id=thread_message.message_id)
 
         elif command == "getdb":
             context.bot.send_document(chat_id=Admin, document=open(Home+"database/db.sqlite", "rb"))

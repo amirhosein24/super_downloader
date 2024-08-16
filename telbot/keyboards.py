@@ -1,9 +1,11 @@
 
 from credentials.creds import Channel, Sponsor
 
+from telethon.tl.custom import Button
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 
+#  ########################################## telegram keyboards ##########################################
 def join_channel_key():
     keyboard = []
 
@@ -22,14 +24,14 @@ def join_channel_key():
     return InlineKeyboardMarkup(keyboard)
 
 
-def spotify_key(link):
+def spotify_key(trackid: str):
     keyboard = [
         [
-            InlineKeyboardButton("128K", callback_data=f"dcb_spotify_128k_{link}"),
-            InlineKeyboardButton("320K", callback_data=f"dcb_spotify_320k_{link}")
+            InlineKeyboardButton("320K", callback_data=f"dcb_spotify_320k_{trackid}"),
+            InlineKeyboardButton("128K", callback_data=f"dcb_spotify_128k_{trackid}")
         ]
     ]
-    return keyboard
+    return InlineKeyboardMarkup(keyboard)
 
 
 def youtube_key(link, data):
@@ -141,3 +143,11 @@ AdminPaymentMenu = [
     ]
 ]
 AdminPaymentMenu = InlineKeyboardMarkup(AdminPaymentMenu)
+
+
+#  ########################################## MTPROTO keyboards ##########################################
+SponsorKeyboard_mtproto = [
+    [
+        Button.url(item, Sponsor[item]) for item in Sponsor.keys()
+    ]
+]
