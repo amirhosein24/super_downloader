@@ -8,7 +8,7 @@ from dateutil.relativedelta import relativedelta
 from sqlalchemy.pool import QueuePool
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine, Column, Integer, String, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Float
 
 from credentials.creds import Home, Bot, Admin
 
@@ -26,7 +26,7 @@ class UserData(Base):
     firstname = Column(String)
     lastname = Column(String)
     usagenum = Column(Integer, default=0)
-    usagesize = Column(Integer, default=0)
+    usagesize = Column(Float, default=0)
     prem_till = Column(DateTime)
     timejoined = Column(DateTime)
 
@@ -52,8 +52,12 @@ def handle_prem_till(chat_id, add: int = 0):
                 user_data.prem_till = prem_till
                 session.commit()
 
-            iranian_date = jdatetime.fromgregorian(day=prem_till.day, month=prem_till.month, year=prem_till.year)
-            return iranian_date.strftime("%Y/%m/%d")
+            if user_data.prem_till:
+                iranian_date = jdatetime.fromgregorian(day=prem_till.day, month=prem_till.month, year=prem_till.year)
+                return iranian_date.strftime("%Y/%m/%d")
+
+            else:
+                return False
 
         else:
             return False
@@ -85,29 +89,38 @@ def add_user(chat_id, username, firstname, lastname):
 
 
 ###########################################################################################################################
-def add_usage_num(chat_id):
+def usage_num(chat_id: int, add: bool = False):
     session = sessionmaker(bind=engine)()
     user_data = session.query(UserData).filter_by(chat_id=chat_id).first()
+
     if user_data:
-        user_data.usagenum += 1
-        session.commit()
+        if add:
+            user_data.usagenum += 1
+            session.commit()
+
+        usage = user_data.usagenum
         session.close()
-        return True
+        return usage
+
     else:
         session.close()
         return False
 
 
 ###########################################################################################################################
-def add_usage_size(chat_id, amount: int):
+def usage_size(chat_id, amount: float = 0):
     session = sessionmaker(bind=engine)()
-
     user_data = session.query(UserData).filter_by(chat_id=chat_id).first()
+
     if user_data:
-        user_data.usagesize += amount
-        session.commit()
+        if amount:
+            user_data.usagesize += amount
+            session.commit()
+
+        entire_size = round(user_data.usagesize, 2)
         session.close()
-        return True
+        return entire_size
+
     else:
         session.close()
         return False

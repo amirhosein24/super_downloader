@@ -1,10 +1,11 @@
 
 from os import remove, _exit
-from os.path import isfile
+from os.path import isfile, getsize
 from asyncio import get_event_loop
 
 from telethon import TelegramClient
 
+from database import database as db
 from telbot.keyboards import SponsorKeyboard_mtproto
 from credentials.creds import ApiHash, ApiId, Admin, BotToken, Home
 
@@ -32,7 +33,7 @@ async def telethon_sender_mtproto(chat_id: int, file_path: list, caption: str = 
         if len(media_group) == 1:  # TODO send the sponsers if its media group
             media_group = media_group[0]
 
-        caption = caption + "\n\n➖➖➖➖➖➖\n🆔 @sup_downloader_bot    ربات دانلودر"
+        caption = caption + "\n\n➖➖➖➖➖➖\n🆔 @supdownloaderbot  ⬇️ ابر دانلودر"
         await client.send_file(chat_id, media_group, caption=caption, force_document=False, allow_cache=False, buttons=SponsorKeyboard_mtproto)
 
     except Exception as error_:
@@ -41,6 +42,11 @@ async def telethon_sender_mtproto(chat_id: int, file_path: list, caption: str = 
     finally:
         for media in file_path:
             if isfile(media):
+                file_size = getsize(media) / (1024 * 1024)
+                print("yep", file_size)
+                db.usage_size(chat_id, file_size)
+                print("sads")
+                db.usage_num(chat_id, add=True)
                 remove(media)
 
 

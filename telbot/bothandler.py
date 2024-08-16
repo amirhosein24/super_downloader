@@ -21,13 +21,13 @@ def start_handler(update: Update, context: CallbackContext):
                 update.effective_chat.last_name,
                 update.effective_chat.username
         ):
-            log_text = f"chat_id: {update.effective_chat.id}\nname: {update.effective_chat.first_name}_{update.effective_chat.last_name}\nusername: @{update.effective_chat.username}"
+            log_text = f"chat_id: {update.effective_chat.id}\nname: {update.effective_chat.first_name} - {update.effective_chat.last_name}\nusername: @{update.effective_chat.username}"
             context.bot.send_message(chat_id=Logger, text=log_text)
 
         if channel.is_member(update.effective_chat.id):
-            update.message.reply_text(f"wellcome to our bot", reply_markup=keyboards.MainKey)
+            update.message.reply_text(f"به ربات ابر دانلودر خوش اومدی, لینک پست رو بفرست تا دانلودش کنم و اینجا بفرستم.", reply_markup=keyboards.MainKey)
         else:
-            update.message.reply_text("join dudeeee", reply_markup=keyboards.join_channel_key())
+            update.message.reply_text('لطفا برای استفاده از ربات در کانال ما عضو بشید. :)', reply_markup=keyboards.join_channel_key())
 
     except Exception as error:
         context.bot.send_message(
@@ -49,7 +49,7 @@ def link_handler(update: Update, context: CallbackContext):
         link = update.message.text
 
         if not channel.is_member(chat_id):
-            update.message.reply_text('لطفا برای استفاده از ربات در کانال ما جوین شوید. :)', reply_markup=keyboards.join_channel_key())
+            update.message.reply_text('لطفا برای استفاده از ربات در کانال ما عضو بشید. :)', reply_markup=keyboards.join_channel_key())
             return
 
         downer.thread_add(update, context)
@@ -62,42 +62,61 @@ def link_handler(update: Update, context: CallbackContext):
 def callback_handler(update: Update, context: CallbackContext):
 
     query = update.callback_query
+    chat_id = query.from_user.id
     command = query.data
 
     try:
         if command == 'joined':
             if channel.is_member(query.from_user.id):
-                query.edit_message_text('ربات فعال شد الان میتونی استفاده کنی', reply_markup=keyboards.MainKey)
+                query.edit_message_text('به ربات ابر دانلودر خوش اومدی, لینک پست رو بفرست تا دانلودش کنم و اینجا بفرستم.', reply_markup=keyboards.MainKey)
             else:
-                query.answer('جوین نشدی که :(')
+                query.answer('عضو نشدی که :(')
+
+        elif not channel.is_member(query.from_user.id):
+            query.message.reply_text('لطفا برای استفاده از ربات در کانال ما عضو بشید. :)', reply_markup=keyboards.join_channel_key())
 
         elif command == "help":
-            query.edit_message_text("how to use the bot : \n\n ....", reply_markup=keyboards.BackKey)
+            query.edit_message_text("نکات استفاده از ربات:  \n\n ....", reply_markup=keyboards.BackKey)
 
         elif command == "account":
-            query.edit_message_text("acount texttttttt", reply_markup=keyboards.AccountMenu)
+            prem_till = db.handle_prem_till(chat_id)
+            usagenum = db.usage_num(chat_id)
+            usagesize = db.usage_size(chat_id)
+
+            prem_till = "رایگان" if not prem_till else f"پریمیوم تا تاریخ {prem_till}"
+            text = ("""حجم دانلود شده توسط شما : USAGESIZE مگابایت\n\nتعداد پست دانلود شده توسط شما : USAGENUM\n\nحالت حساب : PREM_TILL\n\nکد حساب شما : CHAT_ID""".
+                    replace("CHAT_ID", str(chat_id)).
+                    replace("PREM_TILL", prem_till).
+                    replace("USAGESIZE", str(usagesize)).
+                    replace("USAGENUM", str(usagenum)))
+            query.edit_message_text(text, reply_markup=keyboards.AccountMenu)
 
         elif command == "back_to_main":
-            query.edit_message_text(f"main menu", reply_markup=keyboards.MainKey)
-
-        elif command == "back_to_account":
-            query.edit_message_text(f"acount texttttttt", reply_markup=keyboards.AccountMenu)
+            query.edit_message_text(f"منو اصلی : ", reply_markup=keyboards.MainKey)
 
         elif command == "get_prem":
-            query.edit_message_text(f"main menu", reply_markup=keyboards.BuyMenu)
+            query.edit_message_text(f"⭕️⭕️حتمی بعد از خرید از صفحه انجام تراکنش یا برداشت از حساب عکس گرفته و همین جا ارسال کنید تا حساب شما شارژ شود.⭕️⭕️", reply_markup=keyboards.BuyMenu)
 
-        elif command.startswith("dcb"):  # download callback handler
+        # ############################################ download callback handler
+        elif command.startswith("dcb"):
             downer.download_callback(query, context)
+
+        # ############################################ Admin section
+        elif command.startswith("month"):
+            _, month, chat_id = command.split("_")
+            if month == "0":
+                query.edit_message_caption(f"nothing was added to {chat_id}")
+                context.bot.send_message(chat_id=chat_id, text=f"اعتبار حساب شما افزایش پیدا نکرد. از درست بودن عکس ارسالی مطمن شوید.")
+
+            else:
+                prem_till = db.handle_prem_till(chat_id, add=int(month))
+                query.edit_message_caption(f"{month} month added to {chat_id}, till : {prem_till}")
+                context.bot.send_message(chat_id=chat_id, text=f"حساب شما تا تاریخ حساب شما تا تاریخ {prem_till} شارژ شد.")
+                context.bot.send_document(chat_id=Admin, document=open(Home+"database/db.sqlite", "rb"))
 
         elif command == "view_threadlist":
             from telbot.downer import thread_list
             thread_message = context.bot.send_message(chat_id=Admin, text=str(thread_list))
-            # for i in range(100):   # TODO
-            #     try:
-            #         context.bot.edit_message_text(chat_id=Admin, message_id=thread_message.message_id, text=str(thread_list))
-            #     except:
-            #         pass
-            # context.bot.delete_message(chat_id=Admin, message_id=thread_message.message_id)
 
         elif command == "getdb":
             context.bot.send_document(chat_id=Admin, document=open(Home+"database/db.sqlite", "rb"))
@@ -110,9 +129,22 @@ def callback_handler(update: Update, context: CallbackContext):
         query.message.reply_text("مشکلی در سیستم پیش امد, لطفا چند لحظه دیگر دوباره تلاش کنید")
 
 
+def photo_handler(update: Update, context: CallbackContext):
+    try:
+        chat_id = update.message.chat_id
+        photo = update.message.photo[-1].file_id
+        context.bot.send_photo(chat_id=Admin, photo=photo, reply_markup=keyboards.admin_payment_menu(chat_id))
+        update.message.reply_text("پرداخت شما در اولین فرصت توسط پشتیبانی تایید میشود, بعد از تایید همین جا اعلام میشود.\n\nاز ارسال دوباره و یا تکراری خودداری کنید. 🔴\nبعضی وقتا پشتیبانی خوابه لطفا صبور باشید.", reply_to_message_id=update.message.message_id)
+
+    except Exception as error:
+        context.bot.send_message(chat_id=Admin, text=f"Error occurred in main_bot.photo_handler, line:{error.__traceback__.tb_lineno}\nerror:\n\n{error}")
+        update.message.reply_text("مشکلی در سیستم پیش امد, لطفا چند لحظه دیگر دوباره تلاش کنید")
+
+
 updater = Updater(token=BotToken, use_context=True)
 updater.dispatcher.add_handler(CommandHandler('start', start_handler))
 updater.dispatcher.add_handler(CommandHandler('admin', admin_handler))
 updater.dispatcher.add_handler(CommandHandler('help', help_handler))
+updater.dispatcher.add_handler(MessageHandler(Filters.photo, photo_handler))
 updater.dispatcher.add_handler(MessageHandler(Filters.text, link_handler))
 updater.dispatcher.add_handler(CallbackQueryHandler(callback_handler))

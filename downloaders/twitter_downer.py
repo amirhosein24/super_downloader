@@ -4,8 +4,8 @@ import requests
 from credentials.creds import Bot, Admin
 
 # Suppress the InsecureRequestWarning
-# from requests.packages.urllib3.exceptions import InsecureRequestWarning
-# requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 def scrape_media(tweet_id: int) -> list[dict[str, any]]:

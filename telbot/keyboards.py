@@ -18,7 +18,7 @@ def join_channel_key():
 
     keyboard.append(
         [
-            InlineKeyboardButton("جوین شدم :)))", callback_data='joined')
+            InlineKeyboardButton("جوین شدم :)", callback_data='joined')
         ]
     )
     return InlineKeyboardMarkup(keyboard)
@@ -81,17 +81,17 @@ SponsorKeyboard = InlineKeyboardMarkup(SponsorKeyboard)
 
 
 BackKey = [[
-    InlineKeyboardButton("back", callback_data="back_to_main")
+    InlineKeyboardButton("برگشت به منو اصلی 🏡", callback_data="back_to_main")
 ]]
 BackKey = InlineKeyboardMarkup(BackKey)
 
 
 MainKey = [
     [
-        InlineKeyboardButton("helppp", callback_data="help")
+        InlineKeyboardButton("راهنمای استفاده از ربات 👨‍🏫", callback_data="help")
     ],
     [
-        InlineKeyboardButton("me acount", callback_data="account")
+        InlineKeyboardButton("مشاهده حساب 🏦", callback_data="account")
     ]
 ]
 MainKey = InlineKeyboardMarkup(MainKey)
@@ -102,7 +102,7 @@ AccountMenu = [
         InlineKeyboardButton("خرید اشتراک ویژه", callback_data="get_prem")
     ],
     [
-        InlineKeyboardButton("back", callback_data="back_to_main")
+        InlineKeyboardButton("برگشت به منو اصلی 🏡", callback_data="back_to_main")
     ]
 ]
 AccountMenu = InlineKeyboardMarkup(AccountMenu)
@@ -114,13 +114,24 @@ BuyMenu = [
                              url='https://zarinp.al/544899')
     ],
     [
-        InlineKeyboardButton("back", callback_data="back_to_account")
+        InlineKeyboardButton("برگشت به منو اصلی 🏡", callback_data="account")
     ]
 ]
 BuyMenu = InlineKeyboardMarkup(BuyMenu)
 
 
-#  ########################################## admin keyboards ##########################################
+#  ########################################## Admin keyboards ##########################################
+def admin_payment_menu(chat_id):
+    keyboard = [
+        [
+            InlineKeyboardButton("3 month", callback_data=f"month_3_{chat_id}"),
+            InlineKeyboardButton("1 month", callback_data=f"month_1_{chat_id}"),
+            InlineKeyboardButton("none", callback_data=f"month_0_{chat_id}")
+        ]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
 AdminMainKey = [
     [
         InlineKeyboardButton("send to all", callback_data='sendtoall')
@@ -133,17 +144,6 @@ AdminMainKey = [
     ]
 ]
 AdminMainKey = InlineKeyboardMarkup(AdminMainKey)
-
-AdminPaymentMenu = [
-    [
-        InlineKeyboardButton("3 month", callback_data="month-3")
-    ],
-    [
-        InlineKeyboardButton("none", callback_data="month-0")
-    ]
-]
-AdminPaymentMenu = InlineKeyboardMarkup(AdminPaymentMenu)
-
 
 #  ########################################## MTPROTO keyboards ##########################################
 SponsorKeyboard_mtproto = [

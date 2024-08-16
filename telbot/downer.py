@@ -99,11 +99,11 @@ def link_handler(update, context):
             waitmessage = update.message.reply_text(
                 f"file size is  {file_size}", reply_to_message_id=update.message.message_id)
 
-        # if files:  # send the files after downloading them
-        #     uploader.sender(chat_id, files, caption)
-        #     context.bot.delete_message(chat_id, waitmessage.message_id)
-        # else:
-        #     context.bot.edit_message_text(chat_id=update.message.chat_id, message_id=waitmessage.message_id, text="nothin found to download")
+        if files:  # send the files after downloading them
+            uploader.sender(chat_id, files, caption)
+            context.bot.delete_message(chat_id, waitmessage.message_id)
+        else:
+            context.bot.edit_message_text(chat_id=update.message.chat_id, message_id=waitmessage.message_id, text="nothin found to download")
 
     except Exception as error:
         print(f"error in downer.link_handler, error in line {error.__traceback__.tb_lineno}\n\nerror:\n{error}")
