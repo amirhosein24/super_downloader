@@ -72,12 +72,9 @@ def link_handler(update, context):
         files = None
 
         if link.startswith("https://www.youtube.com") or link.startswith("https://youtube.com") or link.startswith("https://youtu.be"):
-
             waitmessage = update.message.reply_text("its you tubeeeeee, wait", reply_to_message_id=update.message.message_id)
             data = youtube_downer.getinfo(link)
-            print(data)
             title, length = data["title"], data["length"]
-
             context.bot.edit_message_text(chat_id=chat_id,
                                           message_id=waitmessage.message_id,
                                           text=f"کیفیت دانلود خود را انتخاب کنید : \n{title}: {length}",
@@ -85,61 +82,65 @@ def link_handler(update, context):
 
         elif link.startswith("https://www.instagram.com") or link.startswith("https://instagram.com"):
             waitmessage = update.message.reply_text("insta yooooooooo", reply_to_message_id=update.message.message_id)
-            files = insta_downer.instagram(chat_id, link)
+            files, caption = insta_downer.instagram(context, chat_id, link)
 
         elif link.startswith("https://x.com/") or link.startswith("https://twitter.com/"):
-
             waitmessage = update.message.reply_text(
                 "twiterrrr yooooo", reply_to_message_id=update.message.message_id)
             files, caption = twitter_downer.main_download(context, chat_id, link)
-            print(files, caption)
 
         elif link.startswith("https://open.spotify.com/"):
-            track_id = link.split('/')[-1]
-            if '?' in track_id:
-                track_id = track_id.split('?')[0]
-            details = spotify_downer.get_track_details(track_id)
-            waitmessage = update.message.reply_text(
-                details, reply_to_message_id=update.message.message_id, reply_markup=keyboards.spotify_key(link))
+            waitmessage = update.message.reply_text("processing ...", reply_to_message_id=update.message.message_id)
+            details, trackid = spotify_downer.get_track_details(link)
+            context.bot.edit_message_text(chat_id=chat_id, message_id=waitmessage.message_id, text=details, reply_markup=keyboards.spotify_key(trackid))
 
         else:
             file_size = direct_downer.get_file_size(link)
             waitmessage = update.message.reply_text(
                 f"file size is  {file_size}", reply_to_message_id=update.message.message_id)
 
-        if files:
-            uploader.sender(chat_id, files, caption)
+        # if files:  # send the files after downloading them
+        #     uploader.sender(chat_id, files, caption)
+        #     context.bot.delete_message(chat_id, waitmessage.message_id)
+        # else:
+        #     context.bot.edit_message_text(chat_id=update.message.chat_id, message_id=waitmessage.message_id, text="nothin found to download")
 
-    except Exception as e:
-        print(f"error in link handler e:{e}")
+    except Exception as error:
+        print(f"error in downer.link_handler, error in line {error.__traceback__.tb_lineno}\n\nerror:\n{error}")
+        context.bot.send_message(
+            Admin, f"error in downer.link_handler, error in line {error.__traceback__.tb_lineno}\n\nerror:\n{error}")
 
     finally:
         thread_remove(chat_id)
 
 
-def download_callback(update, context):
-
-    query = update.callback_query
+def download_callback(query, context):
 
     chat_id = query.from_user.id
-    command = query.data
-
-    _, platform, tag, link = command.split("_")
+    _, platform, tag, link = query.data.split("_")
+    files, caption = [], ""
 
     try:
         if platform == "spotify":
-            pass
+            context.bot.edit_message_text(chat_id=chat_id, message_id=query.message.message_id, text="download started ...")
+            song = spotify_downer.spot_download(link, tag)
+            if song:
+                files.append(song)
 
         elif platform == "youtube":
             caption = query.message.text.split("\n")[1]
             # files = youtube_downer.download(chat_id, link, tag)
-            print(caption)
-            uploader.sender(chat_id, r"C:\Users\amhei\Documenti\GitHub\telegram\super-downloader\downloaders\cache\lol Apple Intelligence is dumb....mp4", caption)
 
-            context.bot.delete_message(chat_id=chat_id, message_id=query.message.message_id)
+        if files:  # send the files after downloading them
+            uploader.sender(chat_id, files, caption)
+            context.bot.delete_message(chat_id, query.message.message_id)
+        else:
+            context.bot.edit_message_text(chat_id=chat_id, message_id=query.message.message_id, text="nothin found to download")
 
-    except Exception as e:
-        print(f"--------{e}")
+    except Exception as error:
+        print(f"--------{error}")
+        context.bot.send_message(
+            Admin, f"error in downer.download_callback, error in line {error.__traceback__.tb_lineno}\n\nerror:\n{error}")
 
     finally:
         thread_remove(chat_id)

@@ -10,3 +10,4 @@ beautifulsoup4~=4.12.3
 instaloader~=4.11
 jdatetime~=5.0.0
 python-dateutil~=2.9.0.post0
+spotdl  # spotdl --download-ffmpeg

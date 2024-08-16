@@ -1,8 +1,11 @@
 
 from os import remove, _exit
-from telethon import TelegramClient
+from os.path import isfile
 from asyncio import get_event_loop
 
+from telethon import TelegramClient
+
+from telbot.keyboards import SponsorKeyboard_mtproto
 from credentials.creds import ApiHash, ApiId, Admin, BotToken, Home
 
 
@@ -16,22 +19,29 @@ except Exception as error:
 mtprotoLoop = get_event_loop()
 
 
-async def telethon_sender_mtproto(chat_id: int, file_path: list, caption: str = None):
+async def telethon_sender_mtproto(chat_id: int, file_path: list, caption: str = ""):
 
     try:
-        for file in file_path:
+        media_group = []
+        for media in file_path:
+            with open(media, 'rb') as f:
+                media_group.append(
+                    await client.upload_file(f, part_size_kb=512)
+                )
 
-            with open(file, 'rb') as f:
-                uploaded_file = await client.upload_file(f, part_size_kb=512)
+        if len(media_group) == 1:  # TODO send the sponsers if its media group
+            media_group = media_group[0]
 
-            await client.send_file(chat_id, uploaded_file, caption=caption, force_document=False)
+        caption = caption + "\n\n➖➖➖➖➖➖\n🆔 @sup_downloader_bot    ربات دانلودر"
+        await client.send_file(chat_id, media_group, caption=caption, force_document=False, allow_cache=False, buttons=SponsorKeyboard_mtproto)
 
     except Exception as error_:
         await client.send_message(Admin, f"error in uploader.telethon_sender_mtproto, line:{error_.__traceback__.tb_lineno}:\n{error_}")
 
-    # finally:
-    #     for item in file_path:
-    #         remove(item)
+    finally:
+        for media in file_path:
+            if isfile(media):
+                remove(media)
 
 
 def sender(chat_id, file_path, caption):
