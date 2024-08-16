@@ -69,7 +69,7 @@ def link_handler(update, context):
 
         link = update.message.text
         chat_id = update.message.chat_id
-        files = None
+        files, caption, callback = None, None, None
 
         if link.startswith("https://www.youtube.com") or link.startswith("https://youtube.com") or link.startswith("https://youtu.be"):
             waitmessage = update.message.reply_text("its you tubeeeeee, wait", reply_to_message_id=update.message.message_id)
@@ -92,7 +92,9 @@ def link_handler(update, context):
         elif link.startswith("https://open.spotify.com/"):
             waitmessage = update.message.reply_text("processing ...", reply_to_message_id=update.message.message_id)
             details, trackid = spotify_downer.get_track_details(link)
-            context.bot.edit_message_text(chat_id=chat_id, message_id=waitmessage.message_id, text=details, reply_markup=keyboards.spotify_key(trackid))
+            if details:
+                context.bot.edit_message_text(chat_id=chat_id, message_id=waitmessage.message_id, text=details, reply_markup=keyboards.spotify_key(trackid))
+                callback = True
 
         else:
             file_size = direct_downer.get_file_size(link)
@@ -102,6 +104,8 @@ def link_handler(update, context):
         if files:  # send the files after downloading them
             uploader.sender(chat_id, files, caption)
             context.bot.delete_message(chat_id, waitmessage.message_id)
+        elif callback:
+            pass
         else:
             context.bot.edit_message_text(chat_id=update.message.chat_id, message_id=waitmessage.message_id, text="nothin found to download")
 
