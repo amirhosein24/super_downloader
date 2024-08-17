@@ -16,7 +16,8 @@ def scrape_media(tweet_id: int) -> list[dict[str, any]]:
         tweet_data = response.json()
 
         media_extended = tweet_data.get('media_extended', [])
-        tweet_text = tweet_data.get('text', '')  # Ensure the correct key is used for the caption
+        # Ensure the correct key is used for the caption
+        tweet_text = tweet_data.get('text', '')
 
         # Combine the media data with the tweet text (caption)
         media_with_captions = []
@@ -78,6 +79,7 @@ def download_media(tweet_data: list[dict], chat_id) -> list[str]:
 def main_download(context, chat_id, link) -> tuple[list, str]:
     try:
         tweet_id = link.split("status/")[-1].split("/")[0]
+        tweet_id = tweet_id.split("?")[0] if "?" in tweet_id else tweet_id
 
         if tweet_id:
             media = scrape_media(int(tweet_id))
