@@ -7,7 +7,7 @@ def load_json():
     home = path.dirname(path.dirname(__file__)) + "/"
 
     try:
-        with open(__file__[:-8] + "creds.json", encoding='utf-8') as file:
+        with open(home + "creds/creds.json", encoding='utf-8') as file:
             config = load(file)
     except FileNotFoundError:
         print("creds.json file wasnt found, exiting the bot ...")

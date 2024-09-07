@@ -22,8 +22,7 @@ def start_handler(update: Update, context: CallbackContext):
                 update.effective_chat.last_name,
                 update.effective_chat.username
         ):
-            log_text = f"chat_id: {update.effective_chat.id}\nname: {update.effective_chat.first_name} - {
-                update.effective_chat.last_name}\nusername: @{update.effective_chat.username}"
+            log_text = f"chat_id: {update.effective_chat.id}\nname: {update.effective_chat.first_name} - {update.effective_chat.last_name}\nusername: @{update.effective_chat.username}"
             context.bot.send_message(chat_id=Logger, text=log_text)
 
         if channel.is_member(update.effective_chat.id):
