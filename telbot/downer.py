@@ -80,8 +80,7 @@ def link_handler(update, context):
             title, length = data["title"], data["length"]
             context.bot.edit_message_text(chat_id=chat_id,
                                           message_id=waitmessage.message_id,
-                                          text=f"کیفیت دانلود خود را انتخاب کنید : \n{
-                                              title}: {length}",
+                                          text=f"کیفیت دانلود خود را انتخاب کنید : \n{title}: {length}",
                                           reply_markup=keyboards.youtube_key(link, data))
 
         elif link.startswith("https://www.instagram.com") or link.startswith("https://instagram.com"):
