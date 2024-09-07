@@ -51,7 +51,6 @@ def getinfo(link):
 
     yt = YouTube(link)
     data = {}
-    print("here")
 
     for stream in yt.streams:
         print(stream)

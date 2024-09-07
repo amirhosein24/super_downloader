@@ -58,8 +58,7 @@ def download_media(tweet_data: list[dict], chat_id) -> list[str]:
             else:
                 continue
 
-            filepath = f"{
-                Home}downloaders/cache/{chat_id}_{index}_{media['media']['type']}.{file_extension}"
+            filepath = f"{Home}downloaders/cache/{chat_id}_{index}_{media['media']['type']}.{file_extension}"
 
             with open(filepath, "wb") as file:
                 for chunk in response.iter_content(1024):
