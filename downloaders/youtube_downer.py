@@ -6,7 +6,7 @@ from datetime import timedelta
 from subprocess import run
 from os import remove, path
 
-from credentials.creds import Home
+from creds import Home
 
 
 def download(chat_id, url, itag):
@@ -71,6 +71,7 @@ def getinfo(link):
                 "itag": stream.itag, "size": round(stream.filesize / (1024 * 1024), 1)
             }
 
-        data["title"], data["length"] = yt.title, str(timedelta(seconds=yt.length))  # in seconds
+        data["title"], data["length"] = yt.title, str(
+            timedelta(seconds=yt.length))  # in seconds
 
     return data

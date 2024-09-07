@@ -2,7 +2,7 @@
 from urllib.parse import urlparse
 from requests import get, head
 
-from credentials.creds import Home
+from creds import Home
 
 
 def download(url):

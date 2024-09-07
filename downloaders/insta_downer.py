@@ -2,7 +2,7 @@
 import requests
 import instaloader
 
-from credentials.creds import Home, Admin, Apps
+from creds import Home, Admin, Apps
 
 
 insta_loader = instaloader.Instaloader()

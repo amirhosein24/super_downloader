@@ -1,5 +1,5 @@
 
-from credentials.creds import Channel, Sponsor
+from creds import Channel, Sponsor
 
 from telethon.tl.custom import Button
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
@@ -12,7 +12,8 @@ def join_channel_key():
     for channel_name in Channel:
         keyboard.append(
             [
-                InlineKeyboardButton(channel_name, url=Channel[channel_name]["url"])
+                InlineKeyboardButton(
+                    channel_name, url=Channel[channel_name]["url"])
             ]
         )
 
@@ -27,8 +28,10 @@ def join_channel_key():
 def spotify_key(trackid: str):
     keyboard = [
         [
-            InlineKeyboardButton("320K", callback_data=f"dcb_spotify_320k_{trackid}"),
-            InlineKeyboardButton("128K", callback_data=f"dcb_spotify_128k_{trackid}")
+            InlineKeyboardButton(
+                "320K", callback_data=f"dcb_spotify_320k_{trackid}"),
+            InlineKeyboardButton(
+                "128K", callback_data=f"dcb_spotify_128k_{trackid}")
         ]
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -88,7 +91,8 @@ BackKey = InlineKeyboardMarkup(BackKey)
 
 MainKey = [
     [
-        InlineKeyboardButton("راهنمای استفاده از ربات 👨‍🏫", callback_data="help")
+        InlineKeyboardButton("راهنمای استفاده از ربات 👨‍🏫",
+                             callback_data="help")
     ],
     [
         InlineKeyboardButton("مشاهده حساب 🏦", callback_data="account")
@@ -102,7 +106,8 @@ AccountMenu = [
         InlineKeyboardButton("خرید اشتراک ویژه", callback_data="get_prem")
     ],
     [
-        InlineKeyboardButton("برگشت به منو اصلی 🏡", callback_data="back_to_main")
+        InlineKeyboardButton("برگشت به منو اصلی 🏡",
+                             callback_data="back_to_main")
     ]
 ]
 AccountMenu = InlineKeyboardMarkup(AccountMenu)
@@ -124,8 +129,10 @@ BuyMenu = InlineKeyboardMarkup(BuyMenu)
 def admin_payment_menu(chat_id):
     keyboard = [
         [
-            InlineKeyboardButton("3 month", callback_data=f"month_3_{chat_id}"),
-            InlineKeyboardButton("1 month", callback_data=f"month_1_{chat_id}"),
+            InlineKeyboardButton(
+                "3 month", callback_data=f"month_3_{chat_id}"),
+            InlineKeyboardButton(
+                "1 month", callback_data=f"month_1_{chat_id}"),
             InlineKeyboardButton("none", callback_data=f"month_0_{chat_id}")
         ]
     ]
@@ -140,7 +147,8 @@ AdminMainKey = [
         InlineKeyboardButton("send data base", callback_data='getdb')
     ],
     [
-        InlineKeyboardButton('view thread list', callback_data='view_threadlist')
+        InlineKeyboardButton('view thread list',
+                             callback_data='view_threadlist')
     ]
 ]
 AdminMainKey = InlineKeyboardMarkup(AdminMainKey)

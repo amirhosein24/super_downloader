@@ -1,7 +1,7 @@
 
 import requests
 
-from credentials.creds import Bot, Admin, Home
+from creds import Bot, Admin, Home
 
 # Suppress the InsecureRequestWarning
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -51,14 +51,15 @@ def download_media(tweet_data: list[dict], chat_id) -> list[str]:
 
             if media['media']['type'] == 'image':
                 file_extension = 'jpg'
-            elif media['media']['type'] == 'animated_gif':
+            elif media['media']["type"] == "gif" or media['media']['type'] == 'animated_gif':
                 file_extension = 'gif'
             elif media['media']['type'] == 'video':
                 file_extension = 'mp4'
             else:
                 continue
 
-            filepath = f"{Home}downloaders/cache/{chat_id}_{index}_{media['media']['type']}.{file_extension}"
+            filepath = f"{
+                Home}downloaders/cache/{chat_id}_{index}_{media['media']['type']}.{file_extension}"
 
             with open(filepath, "wb") as file:
                 for chunk in response.iter_content(1024):

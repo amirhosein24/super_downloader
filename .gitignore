@@ -1,4 +1,4 @@
-credentials/creds.json
+creds/creds.json
 __pycache__/
 cache/
 test/
@@ -10,3 +10,4 @@ telethon.session-journal
 /telbot/MTPROTO.session
 /telbot/MTPROTO.session-journal
 /.idea/dataSources.xml
+/.venv

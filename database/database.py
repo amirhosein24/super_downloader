@@ -10,7 +10,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, Float
 
-from credentials.creds import Home, Bot, Admin
+from creds import Home, Bot, Admin
 
 engine = create_engine(f"sqlite:///{Home}database/db.sqlite", poolclass=QueuePool, pool_recycle=1800,
                        connect_args={'check_same_thread': False})

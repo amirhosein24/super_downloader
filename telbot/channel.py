@@ -1,6 +1,6 @@
 
 from telegram import ChatMember
-from credentials.creds import Channel, Bot, Admin
+from creds import Channel, Bot, Admin
 
 
 def is_member(chat_id):
@@ -11,7 +11,8 @@ def is_member(chat_id):
                 return False
 
         except Exception as error:
-            Bot.send_message(chat_id=Admin, text=f"Error occurred in channel.is_member, error:\n\n{error}")
+            Bot.send_message(
+                chat_id=Admin, text=f"Error occurred in channel.is_member, error:\n\n{error}")
             return True
 
     return True

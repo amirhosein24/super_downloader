@@ -6,7 +6,7 @@ from subprocess import run
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyClientCredentials
 
-from credentials.creds import Home, Apps, Bot, Admin
+from creds import Home, Apps, Bot, Admin
 
 client_credentials_manager = SpotifyClientCredentials(
     client_id=Apps["spotify"]["client_id"],

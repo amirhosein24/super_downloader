@@ -7,12 +7,13 @@ from telethon import TelegramClient
 
 from database import database as db
 from telbot.keyboards import SponsorKeyboard_mtproto
-from credentials.creds import ApiHash, ApiId, Admin, BotToken, Home
+from creds import ApiHash, ApiId, Admin, BotToken, Home
 
 
 print("MTPROTO going live...", end=" ")
 try:
-    client = TelegramClient(f"{Home}telbot/MTPROTO", api_id=ApiId, api_hash=ApiHash).start(bot_token=BotToken)
+    client = TelegramClient(
+        f"{Home}telbot/MTPROTO", api_id=ApiId, api_hash=ApiHash).start(bot_token=BotToken)
     print("done.")
 except Exception as error:
     print(f"error: {error}, exiting app.")
@@ -51,4 +52,5 @@ async def telethon_sender_mtproto(chat_id: int, file_path: list, caption: str = 
 
 
 def sender(chat_id, file_path, caption):
-    mtprotoLoop.run_until_complete(telethon_sender_mtproto(chat_id, file_path, caption))
+    mtprotoLoop.run_until_complete(
+        telethon_sender_mtproto(chat_id, file_path, caption))
