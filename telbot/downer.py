@@ -119,8 +119,6 @@ def link_handler(update, context):
                 chat_id=update.message.chat_id, message_id=waitmessage.message_id, text="nothin found to download")
 
     except Exception as error:
-        print(f"error in downer.link_handler, error in line {
-              error.__traceback__.tb_lineno}\n\nerror:\n{error}")
         context.bot.send_message(
             Admin, f"error in downer.link_handler, error in line {error.__traceback__.tb_lineno}\n\nerror:\n{error}")
 
