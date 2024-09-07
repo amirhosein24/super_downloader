@@ -92,8 +92,7 @@ def callback_handler(update: Update, context: CallbackContext):
             usagenum = db.usage_num(chat_id)
             usagesize = db.usage_size(chat_id)
 
-            prem_till = "رایگان" if not prem_till else f"پریمیوم تا تاریخ {
-                prem_till}"
+            prem_till = "رایگان" if not prem_till else f"پریمیوم تا تاریخ {prem_till}"
             text = ("""حجم دانلود شده توسط شما : USAGESIZE مگابایت\n\nتعداد پست دانلود شده توسط شما : USAGENUM\n\nحالت حساب : PREM_TILL\n\nکد حساب شما : CHAT_ID""".
                     replace("CHAT_ID", str(chat_id)).
                     replace("PREM_TILL", prem_till).
@@ -123,8 +122,7 @@ def callback_handler(update: Update, context: CallbackContext):
 
             else:
                 prem_till = db.handle_prem_till(chat_id, add=int(month))
-                query.edit_message_caption(f"{month} month added to {
-                                           chat_id}, till : {prem_till}")
+                query.edit_message_caption(f"{month} month added to {chat_id}, till : {prem_till}")
                 context.bot.send_message(
                     chat_id=chat_id, text=f"حساب شما تا تاریخ حساب شما تا تاریخ {prem_till} شارژ شد.")
                 context.bot.send_document(chat_id=Admin, document=open(
