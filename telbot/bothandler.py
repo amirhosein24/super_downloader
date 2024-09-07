@@ -62,8 +62,7 @@ def link_handler(update: Update, context: CallbackContext):
 
     except Exception as error:
         update.message.reply_text('ی مشکلی پیش اومد ببشید, دوباره بفرست ')
-        context.bot.send_message(chat_id=Admin, text=f'error in bothandler.link_handler by:{
-                                 chat_id}\nlink:\n{link}\nerror in line {error.__traceback__.tb_lineno}:\n{error}')
+        context.bot.send_message(chat_id=Admin, text=f'error in bothandler.link_handler by:{chat_id}\nlink:\n{link}\nerror in line {error.__traceback__.tb_lineno}:\n{error}')
 
 
 def callback_handler(update: Update, context: CallbackContext):
@@ -144,8 +143,7 @@ def callback_handler(update: Update, context: CallbackContext):
             pass
 
     except Exception as error:
-        context.bot.send_message(chat_id=Admin, text=f"Error occurred in main_bot.callback_handler, line:{
-                                 error.__traceback__.tb_lineno}\nerror:\n\n{error}")
+        context.bot.send_message(chat_id=Admin, text=f"Error occurred in main_bot.callback_handler, line:{error.__traceback__.tb_lineno}\nerror:\n\n{error}")
         query.message.reply_text(
             "مشکلی در سیستم پیش امد, لطفا چند لحظه دیگر دوباره تلاش کنید")
 
@@ -160,8 +158,7 @@ def photo_handler(update: Update, context: CallbackContext):
             "پرداخت شما در اولین فرصت توسط پشتیبانی تایید میشود, بعد از تایید همین جا اعلام میشود.\n\nاز ارسال دوباره و یا تکراری خودداری کنید. 🔴\nبعضی وقتا پشتیبانی خوابه لطفا صبور باشید.", reply_to_message_id=update.message.message_id)
 
     except Exception as error:
-        context.bot.send_message(chat_id=Admin, text=f"Error occurred in main_bot.photo_handler, line:{
-                                 error.__traceback__.tb_lineno}\nerror:\n\n{error}")
+        context.bot.send_message(chat_id=Admin, text=f"Error occurred in main_bot.photo_handler, line:{error.__traceback__.tb_lineno}\nerror:\n\n{error}")
         update.message.reply_text(
             "مشکلی در سیستم پیش امد, لطفا چند لحظه دیگر دوباره تلاش کنید")
 
